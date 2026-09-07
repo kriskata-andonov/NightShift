@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://cx6y8v2q1p4r"]
+[gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/player/PlayerMovement.gd" id="1_mov"]
 [ext_resource type="Script" path="res://scripts/player/PlayerCamera.gd" id="2_cam"]
@@ -17,34 +17,46 @@
 [ext_resource type="Script" path="res://scripts/player/PlayerModel.gd" id="15_model"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
-radius = 0.5
-height = 2.0
 
-[node name="Player" type="CharacterBody3D"]
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_rn7t0"]
+properties/0/path = NodePath(":position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(":rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath("Head:rotation")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+properties/3/path = NodePath(":character_class")
+properties/3/spawn = true
+properties/3/replication_mode = 1
+
+[node name="Player" type="CharacterBody3D" unique_id=1692945597]
 script = ExtResource("1_mov")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1353192499]
 shape = SubResource("CapsuleShape3D_1")
 
-[node name="Head" type="Node3D" parent="."]
+[node name="Head" type="Node3D" parent="." unique_id=1478338008]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
 
-[node name="Camera3D" type="Camera3D" parent="Head"]
+[node name="Camera3D" type="Camera3D" parent="Head" unique_id=1182150706]
 cull_mask = 1048573
 script = ExtResource("2_cam")
 
-[node name="Flashlight" type="SpotLight3D" parent="Head/Camera3D"]
+[node name="Flashlight" type="SpotLight3D" parent="Head/Camera3D" unique_id=1869194141]
 script = ExtResource("3_flash")
 
-[node name="InteractionRay" type="RayCast3D" parent="Head/Camera3D"]
+[node name="InteractionRay" type="RayCast3D" parent="Head/Camera3D" unique_id=1322669338]
 target_position = Vector3(0, 0, -2.5)
 script = ExtResource("4_inter")
 
-[node name="InteractionUI" type="CanvasLayer" parent="."]
+[node name="InteractionUI" type="CanvasLayer" parent="." unique_id=459214528]
 layer = 10
 
-[node name="InteractionPrompt" type="Label" parent="InteractionUI"]
-anchors_preset = 7
+[node name="InteractionPrompt" type="Label" parent="InteractionUI" unique_id=2042067082]
+anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -52,37 +64,41 @@ offset_top = -80.0
 offset_bottom = -40.0
 grow_horizontal = 2
 grow_vertical = 0
-text = ""
 horizontal_alignment = 1
 vertical_alignment = 1
 script = ExtResource("5_prompt")
 
-[node name="InventoryHUD" type="Label" parent="InteractionUI"]
+[node name="InventoryHUD" type="Label" parent="InteractionUI" unique_id=1662753224]
 script = ExtResource("7_hud")
 
-[node name="FlashlightHUD" type="Label" parent="InteractionUI"]
+[node name="FlashlightHUD" type="Label" parent="InteractionUI" unique_id=73197752]
 script = ExtResource("8_flhud")
 
-[node name="StaminaHUD" type="Control" parent="InteractionUI"]
+[node name="StaminaHUD" type="Control" parent="InteractionUI" unique_id=2091150934]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("9_stam")
 
-[node name="FearOverlay" type="ColorRect" parent="InteractionUI"]
+[node name="FearOverlay" type="ColorRect" parent="InteractionUI" unique_id=1981038078]
 script = ExtResource("14_fearov")
 
-[node name="DamageOverlay" type="ColorRect" parent="InteractionUI"]
+[node name="DamageOverlay" type="ColorRect" parent="InteractionUI" unique_id=2040917927]
 script = ExtResource("11_dmg")
 
-[node name="DownedHUD" type="Label" parent="InteractionUI"]
+[node name="DownedHUD" type="Label" parent="InteractionUI" unique_id=1220211714]
 script = ExtResource("12_down")
 
-[node name="PlayerInventory" type="Node" parent="."]
+[node name="PlayerInventory" type="Node" parent="." unique_id=1240264930]
 script = ExtResource("6_inv")
 
-[node name="PlayerHealth" type="Node" parent="."]
+[node name="PlayerHealth" type="Node" parent="." unique_id=1249448977]
 script = ExtResource("10_hp")
 
-[node name="PlayerFear" type="Node" parent="."]
+[node name="PlayerFear" type="Node" parent="." unique_id=1992125858]
 script = ExtResource("13_fear")
 
-[node name="PlayerModel" type="Node3D" parent="."]
+[node name="PlayerModel" type="Node3D" parent="." unique_id=604774339]
 script = ExtResource("15_model")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=970818117]
+replication_config = SubResource("SceneReplicationConfig_rn7t0")

@@ -12,17 +12,27 @@ signal item_used(item_name: String)
 var pickup_scene: PackedScene = preload("res://scenes/items/PickupItem.tscn")
 
 var items: Array = []  # Array of ItemData (or null for empty slots)
+var _initialized_class: int = -1
 
-func _ready() -> void:
-	# Check for Hoarder class
+func _process(_delta: float) -> void:
 	var player := get_parent()
-	if player and "character_class" in player and player.character_class == player.PlayerClass.HOARDER:
+	if player and "character_class" in player:
+		if player.character_class != _initialized_class:
+			initialize(player.character_class)
+
+func initialize(p_class: int) -> void:
+	_initialized_class = p_class
+	if p_class == 2: # HOARDER
 		max_slots = 4
+	else:
+		max_slots = 3
 		
 	# Initialize empty slots
 	items.resize(max_slots)
 	for i in range(max_slots):
 		items[i] = null
+		
+	inventory_changed.emit.call_deferred()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("use_slot_1"):
@@ -86,16 +96,23 @@ func drop_item(index: int) -> void:
 	items[index] = null
 	inventory_changed.emit()
 
-	# Spawn the pickup in the world in front of the player
+	# Spawn the pickup in the world globally
 	var player: CharacterBody3D = get_parent() as CharacterBody3D
-	if player and pickup_scene:
-		var pickup := pickup_scene.instantiate()
-		pickup.item_data = item
-		# Place it 1.5m in front of the player, on the ground
+	if player and item.resource_path:
 		var forward := -player.global_transform.basis.z.normalized()
 		var spawn_pos := player.global_position + forward * 1.5
 		spawn_pos.y = player.global_position.y - 0.5  # Roughly ground level
-		player.get_parent().add_child(pickup)
+		_rpc_spawn_drop.rpc(item.resource_path, spawn_pos)
+
+@rpc("any_peer", "call_local", "reliable")
+func _rpc_spawn_drop(res_path: String, spawn_pos: Vector3) -> void:
+	if not pickup_scene:
+		return
+	var pickup = pickup_scene.instantiate()
+	pickup.item_data = load(res_path)
+	var scene = get_tree().current_scene
+	if scene:
+		scene.add_child(pickup)
 		pickup.global_position = spawn_pos
 
 ## Check if the inventory contains an item with the given name.

@@ -23,6 +23,10 @@ func _process(delta: float) -> void:
 			rotation_degrees.y = target_rotation_y
 
 func interact(_player: Node) -> void:
+	_rpc_toggle_door.rpc()
+
+@rpc("any_peer", "call_local", "reliable")
+func _rpc_toggle_door() -> void:
 	is_open = !is_open
 	if is_open:
 		target_rotation_y = initial_rotation_y + open_angle

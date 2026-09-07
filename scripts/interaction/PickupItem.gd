@@ -25,12 +25,24 @@ func can_interact(_player: Node) -> bool:
 func interact(player: Node) -> void:
 	if not item_data:
 		return
-	# Try to add to the player's inventory
-	var inventory := _get_inventory(player)
-	if not inventory:
+	var peer_id = player.name.to_int()
+	_rpc_pickup.rpc(peer_id)
+
+@rpc("any_peer", "call_local", "reliable")
+func _rpc_pickup(peer_id: int) -> void:
+	if not item_data:
 		return
-	if inventory.add_item(item_data):
-		queue_free()
+		
+	# The player who clicked it gets it locally
+	if peer_id == multiplayer.get_unique_id():
+		var player = get_tree().current_scene.get_node_or_null(str(peer_id))
+		if player:
+			var inventory := _get_inventory(player)
+			if inventory:
+				inventory.add_item(item_data)
+				
+	# Everyone destroys the physical 3D object so it can't be picked up again
+	queue_free()
 
 func get_interaction_text() -> String:
 	if item_data:

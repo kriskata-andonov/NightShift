@@ -8,14 +8,17 @@ var player: CharacterBody3D
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	var current: Node = get_parent()
-	while current:
-		if current is CharacterBody3D:
-			player = current
+	var curr_node: Node = get_parent()
+	while curr_node:
+		if curr_node is CharacterBody3D:
+			player = curr_node
 			break
-		current = current.get_parent()
+		curr_node = curr_node.get_parent()
 
 func _unhandled_input(event: InputEvent) -> void:
+	if player and not player.is_multiplayer_authority():
+		return
+		
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		# Rotate player horizontally (Yaw)
 		if player:

@@ -1,12 +1,14 @@
-[gd_scene format=3 uid="uid://d3y8v2q1p4sa"]
+[gd_scene format=3]
 
-[ext_resource type="PackedScene" uid="uid://cx6y8v2q1p4r" path="res://scenes/player/Player.tscn" id="1_play"]
-[ext_resource type="PackedScene" uid="uid://b7d2x8q3r5t1" path="res://scenes/props/Door.tscn" id="2_door"]
-[ext_resource type="Shader" uid="uid://br7h8mch5bjf7" path="res://materials/grid_floor.gdshader" id="3_grid"]
+[ext_resource type="PackedScene" path="res://scenes/props/Door.tscn" id="2_door"]
+[ext_resource type="Shader" path="res://materials/grid_floor.gdshader" id="3_grid"]
+[ext_resource type="Script" path="res://scripts/interaction/InteractableDoor.gd" id="3_n12x1"]
 [ext_resource type="PackedScene" path="res://scenes/items/PickupItem.tscn" id="4_pickup"]
 [ext_resource type="Resource" path="res://data/items/battery.tres" id="5_battery"]
+[ext_resource type="Script" path="res://scripts/interaction/PickupItem.gd" id="5_dongn"]
 [ext_resource type="Resource" path="res://data/items/fuse.tres" id="6_fuse"]
 [ext_resource type="Script" path="res://scripts/player/PlayerModel.gd" id="7_model"]
+[ext_resource type="Script" path="res://scripts/maps/TestChamber.gd" id="8_map"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_grid"]
 render_priority = 0
@@ -23,6 +25,7 @@ shader_parameter/major_grid_interval = 5
 size = Vector3(50, 1, 50)
 
 [node name="TestChamber" type="Node3D" unique_id=200940740]
+script = ExtResource("8_map")
 
 [node name="Floor" type="StaticBody3D" parent="." unique_id=1936904554]
 
@@ -37,25 +40,29 @@ shape = SubResource("BoxShape3D_1")
 transform = Transform3D(1, 0, 0, 0, -0.5, 0.866025, 0, -0.866025, -0.5, 0, 10, 0)
 shadow_enabled = true
 
-[node name="Player" parent="." unique_id=1735537348 instance=ExtResource("1_play")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
-sprint_fov = 100.0
-
-[node name="Door" parent="." unique_id=562932700 instance=ExtResource("2_door")]
+[node name="Door" type="StaticBody3D" parent="." unique_id=562932700 instance=ExtResource("2_door")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.5, -3)
+script = ExtResource("3_n12x1")
 
-[node name="Battery1" parent="." instance=ExtResource("4_pickup")]
+[node name="Battery1" type="StaticBody3D" parent="." unique_id=1168581855 instance=ExtResource("4_pickup")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.5, -2)
+script = ExtResource("5_dongn")
 item_data = ExtResource("5_battery")
 
-[node name="Battery2" parent="." instance=ExtResource("4_pickup")]
+[node name="Battery2" type="StaticBody3D" parent="." unique_id=331727964 instance=ExtResource("4_pickup")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.5, -2)
+script = ExtResource("5_dongn")
 item_data = ExtResource("5_battery")
 
-[node name="Fuse1" parent="." instance=ExtResource("4_pickup")]
+[node name="Fuse1" type="StaticBody3D" parent="." unique_id=1659594101 instance=ExtResource("4_pickup")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0.5, -3)
+script = ExtResource("5_dongn")
 item_data = ExtResource("6_fuse")
 
-[node name="DummyModel" type="Node3D" parent="."]
+[node name="DummyModel" type="Node3D" parent="." unique_id=1084901299]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.5, -2)
 script = ExtResource("7_model")
+
+[node name="PlayerSpawner" type="MultiplayerSpawner" parent="." unique_id=824608375]
+_spawnable_scenes = PackedStringArray("uid://cx6y8v2q1p4r")
+spawn_path = NodePath("..")

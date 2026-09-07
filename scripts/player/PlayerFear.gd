@@ -57,6 +57,12 @@ func _find_nodes() -> void:
 			flashlight = camera.get_node_or_null("Flashlight")
 
 func _process(delta: float) -> void:
+	if not multiplayer.has_multiplayer_peer():
+		return
+	var player = get_parent()
+	if player and player is CharacterBody3D and not player.is_multiplayer_authority():
+		return
+		
 	# Don't accumulate fear when downed or dead
 	if health_node and (health_node.is_downed() or health_node.state == health_node.State.DEAD):
 		return
@@ -67,6 +73,12 @@ func _process(delta: float) -> void:
 	_update_camera_jitter(delta)
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not multiplayer.has_multiplayer_peer():
+		return
+	var player = get_parent()
+	if player and player is CharacterBody3D and not player.is_multiplayer_authority():
+		return
+		
 	if not event is InputEventKey or not event.pressed:
 		return
 	
@@ -140,7 +152,10 @@ func _update_tier() -> void:
 		if current_tier < Tier.PANIC and is_flickering:
 			is_flickering = false
 			if flashlight and flashlight.is_on:
-				flashlight.visible = true
+				if flashlight.has_method("set_flicker_state"):
+					flashlight.set_flicker_state(true)
+				else:
+					flashlight.visible = true
 
 ## At Panic tier, the flashlight flickers autonomously.
 func _update_flashlight_flicker(delta: float) -> void:
@@ -152,7 +167,10 @@ func _update_flashlight_flicker(delta: float) -> void:
 	flicker_timer -= delta
 	if flicker_timer <= 0.0:
 		is_flickering = not is_flickering
-		flashlight.visible = not is_flickering
+		if flashlight.has_method("set_flicker_state"):
+			flashlight.set_flicker_state(not is_flickering)
+		else:
+			flashlight.visible = not is_flickering
 		# Random interval — rapid, erratic flickers
 		if is_flickering:
 			flicker_timer = randf_range(0.03, 0.12)

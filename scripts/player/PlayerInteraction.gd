@@ -23,6 +23,10 @@ func _ready() -> void:
 		prompt_label.visible = false
 
 func _physics_process(_delta: float) -> void:
+	var player = _get_player()
+	if player and not player.is_multiplayer_authority():
+		return
+		
 	# Clear stale references to freed or dying nodes (e.g. picked-up items)
 	if current_target and (not is_instance_valid(current_target) or current_target.is_queued_for_deletion()):
 		current_target = null
@@ -41,6 +45,10 @@ func _physics_process(_delta: float) -> void:
 		_update_prompt()
 
 func _unhandled_input(event: InputEvent) -> void:
+	var player = _get_player()
+	if player and not player.is_multiplayer_authority():
+		return
+		
 	if event.is_action_pressed("interact") and current_target:
 		if current_target.can_interact(_get_player()):
 			current_target.interact(_get_player())

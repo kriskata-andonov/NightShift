@@ -15,7 +15,7 @@ func _ready() -> void:
 	anchor_bottom = 1.0
 	anchor_left = 0.0
 	anchor_right = 0.0
-	offset_top = -100.0
+	offset_top = -150.0
 	offset_bottom = -10.0
 	offset_left = 10.0
 	offset_right = 400.0
@@ -63,8 +63,8 @@ func _update_display() -> void:
 		lines.append(slot_text)
 	
 	lines.append("")
-	lines.append("[Q] Drop")
+	lines.append("[Q] Drop (Max: %d)" % inventory.max_slots)
 	text = "\n".join(lines)
 
-func _on_item_used(item_name: String) -> void:
+func _on_item_used(_item_name: String) -> void:
 	_update_display()

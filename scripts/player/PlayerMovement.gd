@@ -43,11 +43,32 @@ var head: Node3D = null
 var health_node: Node = null
 var exhausted_audio: AudioStreamPlayer3D = null
 
+func _enter_tree() -> void:
+	var peer_id = name.to_int()
+	set_multiplayer_authority(peer_id)
+	
+	var sync = get_node_or_null("MultiplayerSynchronizer")
+	if sync:
+		sync.set_multiplayer_authority(peer_id)
+
 func _ready() -> void:
-	# Find the camera for FOV effects
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	
+	var inv = get_node_or_null("PlayerInventory")
+	if inv and inv.has_method("initialize"):
+		inv.initialize(character_class)
+	
+	# Cache commonly used nodes
 	head = get_node_or_null("Head")
 	if head:
 		camera = head.get_node_or_null("Camera3D")
+	
+	if not is_multiplayer_authority():
+		var ui = get_node_or_null("InteractionUI")
+		if ui:
+			ui.queue_free()
+		return
+		
 	if camera:
 		camera.fov = normal_fov
 	# Find health node for downed state checks
@@ -81,8 +102,16 @@ func _ready() -> void:
 		normal_head_height *= 0.9 # Shorter
 	elif character_class == PlayerClass.FRESHMAN:
 		normal_head_height *= 0.95 # Slightly shorter
+		
+	if camera:
+		camera.current = true
+
+
 
 func _physics_process(delta: float) -> void:
+	if not is_multiplayer_authority():
+		return
+		
 	var is_player_downed: bool = health_node and health_node.is_downed()
 	var is_player_dead: bool = health_node and health_node.state == health_node.State.DEAD
 

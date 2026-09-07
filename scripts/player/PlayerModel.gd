@@ -22,8 +22,10 @@ func set_class_visuals(new_class: int) -> void:
 			child.queue_free()
 			
 	var body_layer := 1
-	if get_parent() and get_parent() is CharacterBody3D:
-		body_layer = 2
+	var parent = get_parent()
+	if parent and parent is CharacterBody3D:
+		if parent.is_multiplayer_authority():
+			body_layer = 2
 		
 	if new_class == 1: # ATHLETE
 		_build_athlete(body_layer)
@@ -144,6 +146,10 @@ func _build_athlete(body_layer: int) -> void:
 	self.scale = Vector3(1.05, 1.1, 1.05)
 
 func _unhandled_input(event: InputEvent) -> void:
+	var parent = get_parent()
+	if parent and parent is CharacterBody3D and not parent.is_multiplayer_authority():
+		return
+		
 	if not event is InputEventKey or not event.pressed:
 		return
 	
@@ -173,15 +179,19 @@ func _unhandled_input(event: InputEvent) -> void:
 			hazmat_mat.albedo_color = Color(0.9, 0.2, 0.9) # Magenta
 			cheat_buffer = ""
 		elif cheat_buffer.ends_with("cl1"):
+			if parent and "character_class" in parent: parent.character_class = 0
 			set_class_visuals(0) # Engineer
 			cheat_buffer = ""
 		elif cheat_buffer.ends_with("cl2"):
+			if parent and "character_class" in parent: parent.character_class = 1
 			set_class_visuals(1) # Athlete
 			cheat_buffer = ""
 		elif cheat_buffer.ends_with("cl3"):
+			if parent and "character_class" in parent: parent.character_class = 2
 			set_class_visuals(2) # Hoarder
 			cheat_buffer = ""
 		elif cheat_buffer.ends_with("cl4"):
+			if parent and "character_class" in parent: parent.character_class = 3
 			set_class_visuals(3) # Freshman
 			cheat_buffer = ""
 
