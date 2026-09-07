@@ -4,6 +4,12 @@ var player_scene = preload("res://scenes/player/Player.tscn")
 
 func _ready() -> void:
 	NetworkManager.player_disconnected.connect(_on_player_disconnected)
+	
+	# Register spawnable scenes explicitly in code. This avoids any Godot 4 UID/path serialization bugs.
+	var spawner = get_node_or_null("PlayerSpawner")
+	if spawner:
+		spawner.add_spawnable_scene(player_scene.resource_path)
+		
 	if not multiplayer.is_server():
 		return
 	
@@ -12,6 +18,12 @@ func _ready() -> void:
 	var i = 0
 	
 	var peer_ids = NetworkManager.players.keys()
+	
+	# Fix for solo testing: if you hit "Play Current Scene" on TestChamber directly, players array is empty.
+	if peer_ids.is_empty():
+		peer_ids = [1]
+		NetworkManager.players[1] = { "name": "SoloTester", "class": 1 }
+		
 	peer_ids.sort()
 	for peer_id in peer_ids:
 		var pinfo = NetworkManager.players[peer_id]

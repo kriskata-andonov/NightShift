@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://scripts/interaction/PickupItem.gd" id="5_dongn"]
 [ext_resource type="Resource" path="res://data/items/fuse.tres" id="6_fuse"]
 [ext_resource type="Script" path="res://scripts/player/PlayerModel.gd" id="7_model"]
+[ext_resource type="Script" path="res://scripts/maps/TestChamber.gd" id="8_map"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_grid"]
 render_priority = 0
@@ -24,6 +25,7 @@ shader_parameter/major_grid_interval = 5
 size = Vector3(50, 1, 50)
 
 [node name="TestChamber" type="Node3D" unique_id=200940740]
+script = ExtResource("8_map")
 
 [node name="Floor" type="StaticBody3D" parent="." unique_id=1936904554]
 
@@ -62,6 +64,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.5, -2)
 script = ExtResource("7_model")
 
 [node name="PlayerSpawner" type="MultiplayerSpawner" parent="." unique_id=824608375]
-_spawnable_scenes = PackedStringArray("uid://cx6y8v2q1p4r")
 spawn_path = NodePath("..")
+
 
