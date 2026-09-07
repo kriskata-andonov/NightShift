@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://c5k7m9p2v4x6"]
+
+[ext_resource type="Script" path="res://scripts/interaction/PickupItem.gd" id="1_pickup"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pickup"]
+size = Vector3(0.3, 0.3, 0.3)
+
+[node name="PickupItem" type="StaticBody3D"]
+script = ExtResource("1_pickup")
+
+[node name="Mesh" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+size = Vector3(0.3, 0.3, 0.3)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+shape = SubResource("BoxShape3D_pickup")
