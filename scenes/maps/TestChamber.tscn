@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://d3y8v2q1p4sa"]
+
+[ext_resource type="PackedScene" uid="uid://cx6y8v2q1p4r" path="res://scenes/player/Player.tscn" id="1_play"]
+[ext_resource type="PackedScene" uid="uid://b7d2x8q3r5t1" path="res://scenes/props/Door.tscn" id="2_door"]
+[ext_resource type="Shader" uid="uid://br7h8mch5bjf7" path="res://materials/grid_floor.gdshader" id="3_grid"]
+[ext_resource type="PackedScene" path="res://scenes/items/PickupItem.tscn" id="4_pickup"]
+[ext_resource type="Resource" path="res://data/items/battery.tres" id="5_battery"]
+[ext_resource type="Resource" path="res://data/items/fuse.tres" id="6_fuse"]
+[ext_resource type="Script" path="res://scripts/player/PlayerModel.gd" id="7_model"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_grid"]
+render_priority = 0
+shader = ExtResource("3_grid")
+shader_parameter/grid_color = Color(0.4, 0.4, 0.4, 1)
+shader_parameter/bg_color = Color(0.15, 0.15, 0.15, 1)
+shader_parameter/major_grid_color = Color(0.55, 0.55, 0.55, 1)
+shader_parameter/grid_size = 1.0
+shader_parameter/line_thickness = 0.02
+shader_parameter/major_line_thickness = 0.035
+shader_parameter/major_grid_interval = 5
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1"]
+size = Vector3(50, 1, 50)
+
+[node name="TestChamber" type="Node3D" unique_id=200940740]
+
+[node name="Floor" type="StaticBody3D" parent="." unique_id=1936904554]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="Floor" unique_id=100357466]
+size = Vector3(50, 1, 50)
+material = SubResource("ShaderMaterial_grid")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" unique_id=1936294920]
+shape = SubResource("BoxShape3D_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=974955346]
+transform = Transform3D(1, 0, 0, 0, -0.5, 0.866025, 0, -0.866025, -0.5, 0, 10, 0)
+shadow_enabled = true
+
+[node name="Player" parent="." unique_id=1735537348 instance=ExtResource("1_play")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+sprint_fov = 100.0
+
+[node name="Door" parent="." unique_id=562932700 instance=ExtResource("2_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.5, -3)
+
+[node name="Battery1" parent="." instance=ExtResource("4_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.5, -2)
+item_data = ExtResource("5_battery")
+
+[node name="Battery2" parent="." instance=ExtResource("4_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.5, -2)
+item_data = ExtResource("5_battery")
+
+[node name="Fuse1" parent="." instance=ExtResource("4_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0.5, -3)
+item_data = ExtResource("6_fuse")
+
+[node name="DummyModel" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.5, -2)
+script = ExtResource("7_model")
