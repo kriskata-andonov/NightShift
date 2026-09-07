@@ -63,7 +63,7 @@ func _update_display() -> void:
 		lines.append(slot_text)
 	
 	lines.append("")
-	lines.append("[Q] Drop (Max: %d)" % inventory.max_slots)
+	lines.append("[Q] Drop")
 	text = "\n".join(lines)
 
 func _on_item_used(_item_name: String) -> void:

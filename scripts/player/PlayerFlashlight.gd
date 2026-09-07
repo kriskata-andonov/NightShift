@@ -10,10 +10,13 @@ var _is_authority: bool = false
 
 func _ready() -> void:
 	current_battery = max_battery
-	# Find root Player node to check authority
-	var root = get_parent().get_parent().get_parent()
-	if root and root is CharacterBody3D:
-		_is_authority = root.is_multiplayer_authority()
+	# Walk up the tree to find the root Player node for authority check
+	var current: Node = get_parent()
+	while current:
+		if current is CharacterBody3D:
+			_is_authority = current.is_multiplayer_authority()
+			break
+		current = current.get_parent()
 
 func _process(delta: float) -> void:
 	if not _is_authority:
@@ -51,4 +54,3 @@ func recharge(amount: float) -> void:
 	if current_battery > 0 and not is_on:
 		if _is_authority:
 			_rpc_set_light.rpc(true)
-

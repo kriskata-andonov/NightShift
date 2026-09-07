@@ -5,10 +5,6 @@ class_name PlayerFear
 ##   25%+ Uneasy   — subtle dark vignette
 ##   50%+ Distressed — camera jitter, stronger vignette
 ##   75%+ Panic     — flashlight auto-flickers, heavy tunnel vision
-##
-## DEBUG KEYS (remove before shipping):
-##   F = Add 25 fear
-##   G = Reset fear to 0
 
 signal fear_changed(level: float)
 signal threshold_entered(tier: int)
@@ -39,11 +35,27 @@ var flashlight: Node = null
 var camera: Camera3D = null
 var health_node: Node = null
 
-# Buffer for typing cheat codes
-var cheat_buffer: String = ""
-
 func _ready() -> void:
 	_find_nodes()
+	
+	# Connect to CheatCodeManager if it exists
+	var player = get_parent()
+	if player:
+		var cheat_mgr = player.get_node_or_null("CheatCodeManager")
+		if cheat_mgr:
+			cheat_mgr.cheat_activated.connect(_on_cheat)
+
+func _on_cheat(code: String) -> void:
+	match code:
+		"fear":
+			current_fear = minf(current_fear + 25.0, max_fear)
+			fear_changed.emit(current_fear)
+		"crazy":
+			current_fear = max_fear
+			fear_changed.emit(current_fear)
+		"calm":
+			current_fear = 0.0
+			fear_changed.emit(current_fear)
 
 func _find_nodes() -> void:
 	var player := get_parent()
@@ -72,43 +84,13 @@ func _process(delta: float) -> void:
 	_update_flashlight_flicker(delta)
 	_update_camera_jitter(delta)
 
-func _unhandled_input(event: InputEvent) -> void:
-	if not multiplayer.has_multiplayer_peer():
-		return
-	var player = get_parent()
-	if player and player is CharacterBody3D and not player.is_multiplayer_authority():
-		return
-		
-	if not event is InputEventKey or not event.pressed:
-		return
-	
-	if event.unicode != 0:
-		cheat_buffer += char(event.unicode).to_lower()
-		
-		# Keep buffer size manageable
-		if cheat_buffer.length() > 20:
-			cheat_buffer = cheat_buffer.substr(cheat_buffer.length() - 20)
-			
-		if cheat_buffer.ends_with("fear"):
-			current_fear = minf(current_fear + 25.0, max_fear)
-			fear_changed.emit(current_fear)
-			cheat_buffer = ""
-		elif cheat_buffer.ends_with("crazy"):
-			current_fear = max_fear
-			fear_changed.emit(current_fear)
-			cheat_buffer = ""
-		elif cheat_buffer.ends_with("calm"):
-			current_fear = 0.0
-			fear_changed.emit(current_fear)
-			cheat_buffer = ""
-
 ## Core fear accumulation / decay logic.
 func _update_fear(delta: float) -> void:
 	var drate := darkness_rate
 	
 	# Freshman Tradeoff: Fear fills 20% faster when separated (MP proximity not built yet, always active for now)
 	var player := get_parent()
-	if player and "character_class" in player and player.character_class == player.PlayerClass.FRESHMAN:
+	if player and "character_class" in player and player.character_class == PlayerMovement.PlayerClass.FRESHMAN:
 		drate *= 1.2
 		
 	if _is_in_darkness():

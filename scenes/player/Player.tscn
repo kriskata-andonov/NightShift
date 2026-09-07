@@ -15,6 +15,7 @@
 [ext_resource type="Script" path="res://scripts/player/PlayerFear.gd" id="13_fear"]
 [ext_resource type="Script" path="res://scripts/ui/FearOverlay.gd" id="14_fearov"]
 [ext_resource type="Script" path="res://scripts/player/PlayerModel.gd" id="15_model"]
+[ext_resource type="Script" path="res://scripts/player/CheatCodeManager.gd" id="16_cheat"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 
@@ -99,6 +100,9 @@ script = ExtResource("13_fear")
 
 [node name="PlayerModel" type="Node3D" parent="." unique_id=604774339]
 script = ExtResource("15_model")
+
+[node name="CheatCodeManager" type="Node" parent="."]
+script = ExtResource("16_cheat")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=970818117]
 replication_config = SubResource("SceneReplicationConfig_rn7t0")

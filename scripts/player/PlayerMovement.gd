@@ -52,12 +52,6 @@ func _enter_tree() -> void:
 		sync.set_multiplayer_authority(peer_id)
 
 func _ready() -> void:
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	
-	var inv = get_node_or_null("PlayerInventory")
-	if inv and inv.has_method("initialize"):
-		inv.initialize(character_class)
-	
 	# Cache commonly used nodes
 	head = get_node_or_null("Head")
 	if head:
@@ -68,6 +62,9 @@ func _ready() -> void:
 		if ui:
 			ui.queue_free()
 		return
+	
+	# Only the local player captures the mouse and sets up the camera
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		
 	if camera:
 		camera.fov = normal_fov

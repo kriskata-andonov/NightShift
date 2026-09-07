@@ -2,11 +2,6 @@ extends Node
 class_name PlayerHealth
 ## Manages player health with ALIVE → DOWNED → DEAD state machine.
 ## No HUD bar — damage is communicated through screen effects.
-##
-## DEBUG KEYS (remove before shipping):
-##   H = Take 20 damage
-##   K = Instant down
-##   J = Self-revive
 
 signal damage_taken(amount: float)
 signal healed(amount: float)
@@ -26,52 +21,46 @@ var current_health: float = 100.0
 var state: State = State.ALIVE
 var bleedout_timer: float = 0.0
 
-# Buffer for typing cheat codes
-var cheat_buffer: String = ""
-
 func _ready() -> void:
 	current_health = max_health
+	
+	# Connect to CheatCodeManager if it exists
+	var player = get_parent()
+	if player:
+		var cheat_mgr = player.get_node_or_null("CheatCodeManager")
+		if cheat_mgr:
+			cheat_mgr.cheat_activated.connect(_on_cheat)
+
+func _on_cheat(code: String) -> void:
+	match code:
+		"dmg":
+			take_damage(20.0)
+		"hlt":
+			heal(20.0)
+		"down":
+			if state == State.ALIVE:
+				current_health = 0.0
+				health_changed.emit(current_health, max_health)
+				_enter_downed()
+		"dead":
+			if state != State.DEAD:
+				current_health = 0.0
+				health_changed.emit(current_health, max_health)
+				_die()
+		"undie":
+			if state == State.DOWNED or state == State.DEAD:
+				revive()
 
 func _process(delta: float) -> void:
+	var player = get_parent()
+	if player and player is CharacterBody3D and not player.is_multiplayer_authority():
+		return
+		
 	if state == State.DOWNED:
 		bleedout_timer -= delta
 		if bleedout_timer <= 0.0:
 			bleedout_timer = 0.0
 			_die()
-
-func _unhandled_input(event: InputEvent) -> void:
-	if not event is InputEventKey or not event.pressed:
-		return
-	
-	if event.unicode != 0:
-		cheat_buffer += char(event.unicode).to_lower()
-		
-		# Keep buffer size manageable
-		if cheat_buffer.length() > 20:
-			cheat_buffer = cheat_buffer.substr(cheat_buffer.length() - 20)
-			
-		if cheat_buffer.ends_with("dmg"):
-			take_damage(20.0)
-			cheat_buffer = ""
-		elif cheat_buffer.ends_with("hlt"):
-			heal(20.0)
-			cheat_buffer = ""
-		elif cheat_buffer.ends_with("down"):
-			if state == State.ALIVE:
-				current_health = 0.0
-				health_changed.emit(current_health, max_health)
-				_enter_downed()
-			cheat_buffer = ""
-		elif cheat_buffer.ends_with("dead"):
-			if state != State.DEAD:
-				current_health = 0.0
-				health_changed.emit(current_health, max_health)
-				_die()
-			cheat_buffer = ""
-		elif cheat_buffer.ends_with("undie"):
-			if state == State.DOWNED or state == State.DEAD:
-				revive()
-			cheat_buffer = ""
 
 func take_damage(amount: float) -> void:
 	if state != State.ALIVE:

@@ -31,8 +31,15 @@ func host_game(port: int = DEFAULT_PORT) -> Error:
 	return OK
 
 func join_game(address: String, port: int = DEFAULT_PORT) -> Error:
+	address = address.strip_edges()
+	if ":" in address:
+		var parts = address.split(":")
+		address = parts[0]
+		port = parts[1].to_int() # Support custom ports if they typed it!
+		
 	if address.is_empty():
 		address = "127.0.0.1"
+		
 	var peer = ENetMultiplayerPeer.new()
 	var err = peer.create_client(address, port)
 	if err != OK:
@@ -76,7 +83,12 @@ func _on_server_disconnected() -> void:
 @rpc("any_peer", "reliable")
 func _register_player(new_player_info: Dictionary) -> void:
 	var new_player_id = multiplayer.get_remote_sender_id()
-	players[new_player_id] = new_player_info
+	# Validate client data to prevent invalid class IDs or names
+	var safe_info = {
+		"name": str(new_player_info.get("name", "Player")).substr(0, 20),
+		"class": clampi(int(new_player_info.get("class", 1)), 0, 3)
+	}
+	players[new_player_id] = safe_info
 	players_updated.emit()
 
 @rpc("authority", "call_local", "reliable")

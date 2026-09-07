@@ -7,7 +7,6 @@ extends Camera3D
 var player: CharacterBody3D
 
 func _ready() -> void:
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	var curr_node: Node = get_parent()
 	while curr_node:
 		if curr_node is CharacterBody3D:

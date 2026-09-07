@@ -1,7 +1,7 @@
 extends Interactable
 class_name InteractableDoor
 ## A simple door that toggles open/closed via rotation.
-## Used as the first test interactable for the interaction system.
+## Server-authoritative: clients request, server decides and broadcasts.
 
 @export var open_angle: float = 90.0
 @export var open_speed: float = 4.0
@@ -23,11 +23,21 @@ func _process(delta: float) -> void:
 			rotation_degrees.y = target_rotation_y
 
 func interact(_player: Node) -> void:
-	_rpc_toggle_door.rpc()
+	# Ask the server to toggle the door
+	_rpc_request_toggle.rpc_id(1)
 
-@rpc("any_peer", "call_local", "reliable")
-func _rpc_toggle_door() -> void:
-	is_open = !is_open
+## Client requests the server to toggle the door.
+@rpc("any_peer", "reliable")
+func _rpc_request_toggle() -> void:
+	if not multiplayer.is_server():
+		return
+	# Server decides the new state and broadcasts it
+	_rpc_set_door_state.rpc(not is_open)
+
+## Server broadcasts the authoritative door state to all clients.
+@rpc("authority", "call_local", "reliable")
+func _rpc_set_door_state(open: bool) -> void:
+	is_open = open
 	if is_open:
 		target_rotation_y = initial_rotation_y + open_angle
 	else:
