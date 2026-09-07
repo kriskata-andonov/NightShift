@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/ItemData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Fuse"
+description = "Required to restore generator power."
+item_type = 1
+is_stackable = false
+max_stack = 1
+use_action = "fuse"
+pickup_color = Color(0.9, 0.7, 0.1, 1)

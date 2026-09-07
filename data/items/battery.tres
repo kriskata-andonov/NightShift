@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/ItemData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Battery"
+description = "Restores flashlight power."
+item_type = 0
+is_stackable = false
+max_stack = 1
+use_action = "battery"
+pickup_color = Color(0.2, 0.8, 0.2, 1)

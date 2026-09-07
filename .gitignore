@@ -1,0 +1,13 @@
+# Godot 4+ specific ignores
+.godot/
+*.translation
+*.gdignore
+*.uid
+
+# Exports
+export/
+export_presets.cfg
+
+# OS generated files
+.DS_Store
+Thumbs.db
