@@ -65,6 +65,11 @@ func _ready() -> void:
 	
 	# Only the local player captures the mouse and sets up the camera
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	
+	# Initialize inventory with correct class (fallback for clients)
+	var inv = get_node_or_null("PlayerInventory")
+	if inv and inv.has_method("initialize"):
+		inv.initialize(character_class)
 		
 	if camera:
 		camera.fov = normal_fov

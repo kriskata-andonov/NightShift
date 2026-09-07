@@ -13,6 +13,12 @@ var pickup_scene: PackedScene = preload("res://scenes/items/PickupItem.tscn")
 
 var items: Array = []  # Array of ItemData (or null for empty slots)
 
+func _ready() -> void:
+	# Default initialization so items array is never empty
+	items.resize(max_slots)
+	for i in range(max_slots):
+		items[i] = null
+
 ## Called explicitly by TestChamber after spawning the player and setting character_class.
 func initialize(p_class: int) -> void:
 	if p_class == 2: # HOARDER
@@ -98,7 +104,13 @@ func drop_item(index: int) -> void:
 		var forward := -player.global_transform.basis.z.normalized()
 		var spawn_pos := player.global_position + forward * 1.5
 		spawn_pos.y = player.global_position.y - 0.5  # Roughly ground level
-		_rpc_request_drop.rpc_id(1, item.resource_path, spawn_pos)
+		if multiplayer.has_multiplayer_peer():
+			if multiplayer.is_server():
+				_rpc_spawn_drop.rpc(item.resource_path, spawn_pos)
+			else:
+				_rpc_request_drop.rpc_id(1, item.resource_path, spawn_pos)
+		else:
+			_spawn_drop_local(item.resource_path, spawn_pos)
 
 ## Client requests the server to spawn a dropped item.
 @rpc("any_peer", "reliable")
@@ -110,6 +122,10 @@ func _rpc_request_drop(res_path: String, spawn_pos: Vector3) -> void:
 ## Server tells all clients to spawn the dropped item.
 @rpc("authority", "call_local", "reliable")
 func _rpc_spawn_drop(res_path: String, spawn_pos: Vector3) -> void:
+	_spawn_drop_local(res_path, spawn_pos)
+
+## Local item spawner — used by both RPC and direct calls.
+func _spawn_drop_local(res_path: String, spawn_pos: Vector3) -> void:
 	if not pickup_scene:
 		return
 	var pickup = pickup_scene.instantiate()
