@@ -1,0 +1,88 @@
+[gd_scene load_steps=15 format=3 uid="uid://cx6y8v2q1p4r"]
+
+[ext_resource type="Script" path="res://scripts/player/PlayerMovement.gd" id="1_mov"]
+[ext_resource type="Script" path="res://scripts/player/PlayerCamera.gd" id="2_cam"]
+[ext_resource type="Script" path="res://scripts/player/PlayerFlashlight.gd" id="3_flash"]
+[ext_resource type="Script" path="res://scripts/player/PlayerInteraction.gd" id="4_inter"]
+[ext_resource type="Script" path="res://scripts/ui/InteractionPrompt.gd" id="5_prompt"]
+[ext_resource type="Script" path="res://scripts/player/PlayerInventory.gd" id="6_inv"]
+[ext_resource type="Script" path="res://scripts/ui/InventoryHUD.gd" id="7_hud"]
+[ext_resource type="Script" path="res://scripts/ui/FlashlightHUD.gd" id="8_flhud"]
+[ext_resource type="Script" path="res://scripts/ui/StaminaHUD.gd" id="9_stam"]
+[ext_resource type="Script" path="res://scripts/player/PlayerHealth.gd" id="10_hp"]
+[ext_resource type="Script" path="res://scripts/ui/DamageOverlay.gd" id="11_dmg"]
+[ext_resource type="Script" path="res://scripts/ui/DownedHUD.gd" id="12_down"]
+[ext_resource type="Script" path="res://scripts/player/PlayerFear.gd" id="13_fear"]
+[ext_resource type="Script" path="res://scripts/ui/FearOverlay.gd" id="14_fearov"]
+[ext_resource type="Script" path="res://scripts/player/PlayerModel.gd" id="15_model"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
+radius = 0.5
+height = 2.0
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_mov")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_1")
+
+[node name="Head" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Head"]
+cull_mask = 1048573
+script = ExtResource("2_cam")
+
+[node name="Flashlight" type="SpotLight3D" parent="Head/Camera3D"]
+script = ExtResource("3_flash")
+
+[node name="InteractionRay" type="RayCast3D" parent="Head/Camera3D"]
+target_position = Vector3(0, 0, -2.5)
+script = ExtResource("4_inter")
+
+[node name="InteractionUI" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="InteractionPrompt" type="Label" parent="InteractionUI"]
+anchors_preset = 7
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -80.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 0
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("5_prompt")
+
+[node name="InventoryHUD" type="Label" parent="InteractionUI"]
+script = ExtResource("7_hud")
+
+[node name="FlashlightHUD" type="Label" parent="InteractionUI"]
+script = ExtResource("8_flhud")
+
+[node name="StaminaHUD" type="Control" parent="InteractionUI"]
+script = ExtResource("9_stam")
+
+[node name="FearOverlay" type="ColorRect" parent="InteractionUI"]
+script = ExtResource("14_fearov")
+
+[node name="DamageOverlay" type="ColorRect" parent="InteractionUI"]
+script = ExtResource("11_dmg")
+
+[node name="DownedHUD" type="Label" parent="InteractionUI"]
+script = ExtResource("12_down")
+
+[node name="PlayerInventory" type="Node" parent="."]
+script = ExtResource("6_inv")
+
+[node name="PlayerHealth" type="Node" parent="."]
+script = ExtResource("10_hp")
+
+[node name="PlayerFear" type="Node" parent="."]
+script = ExtResource("13_fear")
+
+[node name="PlayerModel" type="Node3D" parent="."]
+script = ExtResource("15_model")
