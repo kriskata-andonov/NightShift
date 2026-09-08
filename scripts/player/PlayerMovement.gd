@@ -7,7 +7,13 @@ enum PlayerClass {
 	FRESHMAN
 }
 
-@export var character_class: PlayerClass = PlayerClass.ATHLETE
+@export var character_class: PlayerClass = PlayerClass.ATHLETE:
+	set(value):
+		character_class = value
+		if is_inside_tree():
+			var inv = get_node_or_null("PlayerInventory")
+			if inv and inv.has_method("initialize"):
+				inv.initialize(value)
 
 @export var walk_speed: float = 3.5
 @export var sprint_speed: float = 6.5

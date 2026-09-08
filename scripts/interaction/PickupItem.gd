@@ -25,6 +25,10 @@ func can_interact(_player: Node) -> bool:
 func interact(player: Node) -> void:
 	if not item_data:
 		return
+	var inventory := _get_inventory(player)
+	if inventory and inventory.has_method("is_full") and inventory.is_full():
+		return # Do nothing if full
+		
 	var peer_id = player.name.to_int()
 	_rpc_pickup.rpc(peer_id)
 
@@ -44,7 +48,11 @@ func _rpc_pickup(peer_id: int) -> void:
 	# Everyone destroys the physical 3D object so it can't be picked up again
 	queue_free()
 
-func get_interaction_text() -> String:
+func get_interaction_text(player: Node = null) -> String:
+	if player:
+		var inventory := _get_inventory(player)
+		if inventory and inventory.has_method("is_full") and inventory.is_full():
+			return "(Inventory Full)"
 	if item_data:
 		return "Pick Up " + item_data.item_name
 	return "Pick Up"

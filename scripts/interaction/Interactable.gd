@@ -12,5 +12,5 @@ func interact(_player: Node) -> void:
 	pass
 
 ## Return the text shown in the interaction prompt (e.g., "Open Door").
-func get_interaction_text() -> String:
+func get_interaction_text(_player: Node = null) -> String:
 	return "Interact"

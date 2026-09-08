@@ -1,14 +1,12 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cqfk1aubwnbet"]
 
-[ext_resource type="PackedScene" path="res://scenes/props/Door.tscn" id="2_door"]
-[ext_resource type="Shader" path="res://materials/grid_floor.gdshader" id="3_grid"]
-[ext_resource type="Script" path="res://scripts/interaction/InteractableDoor.gd" id="3_n12x1"]
-[ext_resource type="PackedScene" path="res://scenes/items/PickupItem.tscn" id="4_pickup"]
+[ext_resource type="PackedScene" uid="uid://b7d2x8q3r5t1" path="res://scenes/props/Door.tscn" id="2_door"]
+[ext_resource type="Shader" uid="uid://br7h8mch5bjf7" path="res://materials/grid_floor.gdshader" id="3_grid"]
+[ext_resource type="PackedScene" uid="uid://c5k7nap2v4x6" path="res://scenes/items/PickupItem.tscn" id="4_pickup"]
 [ext_resource type="Resource" path="res://data/items/battery.tres" id="5_battery"]
-[ext_resource type="Script" path="res://scripts/interaction/PickupItem.gd" id="5_dongn"]
 [ext_resource type="Resource" path="res://data/items/fuse.tres" id="6_fuse"]
-[ext_resource type="Script" path="res://scripts/player/PlayerModel.gd" id="7_model"]
-[ext_resource type="Script" path="res://scripts/maps/TestChamber.gd" id="8_map"]
+[ext_resource type="Script" uid="uid://crexaekaruaw7" path="res://scripts/player/PlayerModel.gd" id="7_model"]
+[ext_resource type="Script" uid="uid://b38vxv60dilxu" path="res://scripts/maps/TestChamber.gd" id="8_map"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_grid"]
 render_priority = 0
@@ -40,30 +38,44 @@ shape = SubResource("BoxShape3D_1")
 transform = Transform3D(1, 0, 0, 0, -0.5, 0.866025, 0, -0.866025, -0.5, 0, 10, 0)
 shadow_enabled = true
 
-[node name="Door" type="StaticBody3D" parent="." unique_id=562932700 instance=ExtResource("2_door")]
+[node name="Door" parent="." unique_id=562932700 instance=ExtResource("2_door")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.5, -3)
-script = ExtResource("3_n12x1")
 
-[node name="Battery1" type="StaticBody3D" parent="." unique_id=1168581855 instance=ExtResource("4_pickup")]
+[node name="Door2" parent="." unique_id=1273347968 instance=ExtResource("2_door")]
+transform = Transform3D(0.028126182, 0, 0.9996044, 0, 1, 0, -0.9996044, 0, 0.028126182, 3.0267696, 0.5, -1.0237384)
+
+[node name="Battery1" parent="." unique_id=1168581855 instance=ExtResource("4_pickup")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.5, -2)
-script = ExtResource("5_dongn")
 item_data = ExtResource("5_battery")
 
-[node name="Battery2" type="StaticBody3D" parent="." unique_id=331727964 instance=ExtResource("4_pickup")]
+[node name="Battery2" parent="." unique_id=331727964 instance=ExtResource("4_pickup")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.5, -2)
-script = ExtResource("5_dongn")
 item_data = ExtResource("5_battery")
 
-[node name="Fuse1" type="StaticBody3D" parent="." unique_id=1659594101 instance=ExtResource("4_pickup")]
+[node name="Battery3" parent="." unique_id=864267011 instance=ExtResource("4_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.665227, 0.5, -2)
+item_data = ExtResource("5_battery")
+
+[node name="Battery4" parent="." unique_id=74081157 instance=ExtResource("4_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4093218, 0.5, -1.4229542)
+item_data = ExtResource("5_battery")
+
+[node name="Fuse1" parent="." unique_id=1659594101 instance=ExtResource("4_pickup")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0.5, -3)
-script = ExtResource("5_dongn")
+item_data = ExtResource("6_fuse")
+
+[node name="Fuse2" parent="." unique_id=2045865447 instance=ExtResource("4_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6865034, 0.764246, -2.4131603)
+item_data = ExtResource("6_fuse")
+
+[node name="Fuse3" parent="." unique_id=1636641519 instance=ExtResource("4_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5232, 0.5, -1.0244129)
 item_data = ExtResource("6_fuse")
 
 [node name="DummyModel" type="Node3D" parent="." unique_id=1084901299]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.5, -2)
+visible = false
 script = ExtResource("7_model")
 
 [node name="PlayerSpawner" type="MultiplayerSpawner" parent="." unique_id=824608375]
 spawn_path = NodePath("..")
-
-

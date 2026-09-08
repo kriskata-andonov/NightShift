@@ -85,7 +85,7 @@ func _update_prompt() -> void:
 	if not prompt_label:
 		return
 	if current_target and is_instance_valid(current_target) and not current_target.is_queued_for_deletion() and current_target.can_interact(_get_player()):
-		prompt_label.text = "[E] " + current_target.get_interaction_text()
+		prompt_label.text = "[E] " + current_target.get_interaction_text(_get_player())
 		prompt_label.visible = true
 	else:
 		prompt_label.visible = false

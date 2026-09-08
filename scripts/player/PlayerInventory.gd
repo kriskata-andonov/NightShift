@@ -53,13 +53,24 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## Try to add an item to the inventory. Returns true if successful.
 func add_item(item: ItemData) -> bool:
+	if is_full():
+		return false
+		
 	for i in range(max_slots):
 		if items[i] == null:
 			items[i] = item
 			inventory_changed.emit()
 			return true
-	# Inventory full
 	return false
+
+## Returns true if all slots are occupied.
+func is_full() -> bool:
+	if items.size() < max_slots:
+		return false
+	for i in range(max_slots):
+		if items[i] == null:
+			return false
+	return true
 
 ## Remove and return the item at the given slot index.
 func remove_item(index: int) -> ItemData:
@@ -104,37 +115,23 @@ func drop_item(index: int) -> void:
 		var forward := -player.global_transform.basis.z.normalized()
 		var spawn_pos := player.global_position + forward * 1.5
 		spawn_pos.y = player.global_position.y - 0.5  # Roughly ground level
-		if multiplayer.has_multiplayer_peer():
-			if multiplayer.is_server():
-				_rpc_spawn_drop.rpc(item.resource_path, spawn_pos)
-			else:
-				_rpc_request_drop.rpc_id(1, item.resource_path, spawn_pos)
+		if not multiplayer.has_multiplayer_peer():
+			var drop_name = "drop_solo_%d" % Time.get_ticks_msec()
+			get_tree().current_scene.rpc_spawn_drop_global(item.resource_path, spawn_pos, drop_name)
+		elif multiplayer.is_server():
+			var drop_name = "drop_%d_%d" % [multiplayer.get_unique_id(), Time.get_ticks_msec()]
+			get_tree().current_scene.rpc_spawn_drop_global.rpc(item.resource_path, spawn_pos, drop_name)
 		else:
-			_spawn_drop_local(item.resource_path, spawn_pos)
+			_rpc_request_drop.rpc_id(1, item.resource_path, spawn_pos)
 
 ## Client requests the server to spawn a dropped item.
 @rpc("any_peer", "reliable")
 func _rpc_request_drop(res_path: String, spawn_pos: Vector3) -> void:
 	if not multiplayer.is_server():
 		return
-	_rpc_spawn_drop.rpc(res_path, spawn_pos)
-
-## Server tells all clients to spawn the dropped item.
-@rpc("authority", "call_local", "reliable")
-func _rpc_spawn_drop(res_path: String, spawn_pos: Vector3) -> void:
-	_spawn_drop_local(res_path, spawn_pos)
-
-## Local item spawner — used by both RPC and direct calls.
-func _spawn_drop_local(res_path: String, spawn_pos: Vector3) -> void:
-	if not pickup_scene:
-		return
-	var pickup = pickup_scene.instantiate()
-	pickup.item_data = load(res_path)
-	pickup.name = "drop_%d" % Time.get_ticks_msec()
-	var scene = get_tree().current_scene
-	if scene:
-		scene.add_child(pickup)
-		pickup.global_position = spawn_pos
+	var peer_id = multiplayer.get_remote_sender_id()
+	var drop_name = "drop_%d_%d" % [peer_id, Time.get_ticks_msec()]
+	get_tree().current_scene.rpc_spawn_drop_global.rpc(res_path, spawn_pos, drop_name)
 
 ## Check if the inventory contains an item with the given name.
 func has_item(item_name: String) -> bool:

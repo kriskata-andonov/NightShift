@@ -43,3 +43,12 @@ func _on_player_disconnected(id: int) -> void:
 		var p = get_node_or_null(str(id))
 		if p:
 			p.queue_free()
+
+@rpc("authority", "call_local", "reliable")
+func rpc_spawn_drop_global(res_path: String, spawn_pos: Vector3, drop_name: String) -> void:
+	var pickup_scene = preload("res://scenes/items/PickupItem.tscn")
+	var pickup = pickup_scene.instantiate()
+	pickup.item_data = load(res_path)
+	pickup.name = drop_name
+	add_child(pickup)
+	pickup.global_position = spawn_pos

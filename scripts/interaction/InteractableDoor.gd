@@ -55,7 +55,7 @@ func _set_door_state(open: bool) -> void:
 	else:
 		target_rotation_y = initial_rotation_y
 
-func get_interaction_text() -> String:
+func get_interaction_text(_player: Node = null) -> String:
 	if is_open:
 		return "Close Door"
 	else:
