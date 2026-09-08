@@ -1,0 +1,95 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/props/Door.tscn" id="1_gvvav"]
+[ext_resource type="Script" path="res://scripts/interaction/InteractableDoor.gd" id="2_us8jc"]
+[ext_resource type="PackedScene" path="res://scenes/entities/Watcher.tscn" id="3_7glq2"]
+[ext_resource type="Script" path="res://scripts/entities/Watcher.gd" id="4_xahen"]
+[ext_resource type="Script" path="res://scripts/maps/LabFacility.gd" id="5_script"]
+
+[sub_resource type="Environment" id="Environment_p5lce"]
+background_mode = 1
+background_color = Color(0.02, 0.02, 0.02, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.05, 0.05, 0.05, 1)
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_8mt7p"]
+geometry_parsed_geometry_type = 1
+agent_radius = 0.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ho1lt"]
+albedo_color = Color(0.3, 0.3, 0.3, 1)
+
+[node name="LabFacility" type="Node3D" unique_id=173004524]
+script = ExtResource("5_script")
+
+[node name="PlayerSpawner" type="MultiplayerSpawner" parent="." unique_id=726507228]
+spawn_path = NodePath("..")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1512197146]
+environment = SubResource("Environment_p5lce")
+
+[node name="NavigationRegion" type="NavigationRegion3D" parent="." unique_id=371096749]
+navigation_mesh = SubResource("NavigationMesh_8mt7p")
+
+[node name="MapGeometry" type="CSGCombiner3D" parent="NavigationRegion" unique_id=145277721]
+use_collision = true
+
+[node name="ObservationRoom" type="CSGBox3D" parent="NavigationRegion/MapGeometry" unique_id=1301911045]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+size = Vector3(10, 4, 10)
+material = SubResource("StandardMaterial3D_ho1lt")
+
+[node name="@CSGBox3D@2" type="CSGBox3D" parent="NavigationRegion/MapGeometry/ObservationRoom" unique_id=557654742]
+operation = 2
+size = Vector3(9.5, 3.8, 9.5)
+
+[node name="ObsLight" type="OmniLight3D" parent="NavigationRegion/MapGeometry/ObservationRoom" unique_id=1104052462]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+light_energy = 1.5
+omni_range = 8.0
+
+[node name="Corridor1" type="CSGBox3D" parent="NavigationRegion/MapGeometry" unique_id=133448948]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -15)
+size = Vector3(4, 4, 20)
+material = SubResource("StandardMaterial3D_ho1lt")
+
+[node name="@CSGBox3D@3" type="CSGBox3D" parent="NavigationRegion/MapGeometry/Corridor1" unique_id=1666951330]
+operation = 2
+size = Vector3(3.5, 3.8, 19.5)
+
+[node name="Corridor2" type="CSGBox3D" parent="NavigationRegion/MapGeometry" unique_id=508423256]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 2, -23)
+size = Vector3(18, 4, 4)
+material = SubResource("StandardMaterial3D_ho1lt")
+
+[node name="@CSGBox3D@4" type="CSGBox3D" parent="NavigationRegion/MapGeometry/Corridor2" unique_id=1523264564]
+operation = 2
+size = Vector3(17.5, 3.8, 3.5)
+
+[node name="DoorHole1" type="CSGBox3D" parent="NavigationRegion/MapGeometry" unique_id=2041976746]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, -5)
+operation = 2
+size = Vector3(2, 3.4, 2)
+
+[node name="DoorHole2" type="CSGBox3D" parent="NavigationRegion/MapGeometry" unique_id=1240433803]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.8, -23)
+operation = 2
+size = Vector3(2, 3.4, 2)
+
+[node name="Table" type="CSGBox3D" parent="NavigationRegion/MapGeometry" unique_id=1773602233]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.5, 3)
+size = Vector3(2, 1, 1)
+
+[node name="Door1" type="StaticBody3D" parent="." unique_id=2004806496 instance=ExtResource("1_gvvav")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -0.9, 0.1, -5)
+script = ExtResource("2_us8jc")
+
+[node name="Door2" type="StaticBody3D" parent="." unique_id=921665111 instance=ExtResource("1_gvvav")]
+transform = Transform3D(-6.556708e-08, 0, 1.5, 0, 1.5, 0, -1.5, 0, -6.556708e-08, 2, 0.1, -22.1)
+script = ExtResource("2_us8jc")
+
+[node name="Watcher" type="CharacterBody3D" parent="." unique_id=264910289 instance=ExtResource("3_7glq2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 1.5, -23)
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("4_xahen")

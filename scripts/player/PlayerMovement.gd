@@ -58,6 +58,7 @@ func _enter_tree() -> void:
 		sync.set_multiplayer_authority(peer_id)
 
 func _ready() -> void:
+	add_to_group("players")
 	# Cache commonly used nodes
 	head = get_node_or_null("Head")
 	if head:

@@ -33,7 +33,9 @@ properties/3/path = NodePath(":character_class")
 properties/3/spawn = true
 properties/3/replication_mode = 1
 
-[node name="Player" type="CharacterBody3D" unique_id=1692945597]
+[node name="Player" type="CharacterBody3D" groups=["players"] unique_id=1692945597]
+collision_layer = 2
+collision_mask = 7
 script = ExtResource("1_mov")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1353192499]
@@ -51,6 +53,7 @@ script = ExtResource("3_flash")
 
 [node name="InteractionRay" type="RayCast3D" parent="Head/Camera3D" unique_id=1322669338]
 target_position = Vector3(0, 0, -2.5)
+collision_mask = 5
 script = ExtResource("4_inter")
 
 [node name="InteractionUI" type="CanvasLayer" parent="." unique_id=459214528]

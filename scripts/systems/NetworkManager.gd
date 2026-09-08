@@ -94,4 +94,4 @@ func _register_player(new_player_info: Dictionary) -> void:
 @rpc("authority", "call_local", "reliable")
 func start_game() -> void:
 	game_started.emit()
-	get_tree().change_scene_to_file("res://scenes/maps/TestChamber.tscn")
+	get_tree().change_scene_to_file("res://scenes/maps/LabFacility.tscn")

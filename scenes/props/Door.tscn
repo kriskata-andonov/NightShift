@@ -9,6 +9,7 @@ albedo_color = Color(0.35, 0.25, 0.15, 1)
 size = Vector3(1.2, 2.2, 0.1)
 
 [node name="Door" type="StaticBody3D"]
+collision_layer = 4
 script = ExtResource("1_door")
 
 [node name="DoorMesh" type="CSGBox3D" parent="."]
