@@ -191,8 +191,11 @@ func _physics_process(delta: float) -> void:
 		var target_fov = sprint_fov if is_sprinting else normal_fov
 		camera.fov = lerp(camera.fov, target_fov, fov_lerp_speed * delta)
 
-	# Get the input direction and handle the movement/deceleration.
-	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+	# Only allow movement if mouse is captured (meaning no UI is open)
+	var input_dir := Vector2.ZERO
+	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+		
 	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 
 	if direction:
@@ -217,7 +220,10 @@ func _process_downed_movement(delta: float) -> void:
 		camera.fov = lerp(camera.fov, normal_fov, fov_lerp_speed * delta)
 
 	# Slow crawl movement only
-	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+	var input_dir := Vector2.ZERO
+	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+		
 	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 
 	if direction:

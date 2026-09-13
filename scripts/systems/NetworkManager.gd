@@ -8,14 +8,32 @@ const DEFAULT_PORT = 7777
 const MAX_CLIENTS = 4
 
 var players = {} # Dictionary of peer_id -> { "name": String, "class": int }
-var player_info = { "name": "Player", "class": 1 } # Local player info
+var player_info = {"name": "Player", "class": 1} # Local player info
+
+var audio_hover: AudioStreamPlayer
+var audio_click: AudioStreamPlayer
 
 func _ready() -> void:
+	# Setup Audio Players
+	audio_hover = AudioStreamPlayer.new()
+	audio_hover.stream = preload("res://assets/audio/ui/ui_hover.tres")
+	add_child(audio_hover)
+	
+	audio_click = AudioStreamPlayer.new()
+	audio_click.stream = preload("res://assets/audio/ui/ui_click.tres")
+	add_child(audio_click)
+	
 	multiplayer.peer_connected.connect(_on_player_connected)
 	multiplayer.peer_disconnected.connect(_on_player_disconnected)
 	multiplayer.connected_to_server.connect(_on_connected_ok)
 	multiplayer.connection_failed.connect(_on_connected_fail)
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
+
+func play_ui_hover() -> void:
+	if audio_hover: audio_hover.play()
+
+func play_ui_click() -> void:
+	if audio_click: audio_click.play()
 
 func host_game(port: int = DEFAULT_PORT) -> Error:
 	var peer = ENetMultiplayerPeer.new()
@@ -94,4 +112,19 @@ func _register_player(new_player_info: Dictionary) -> void:
 @rpc("authority", "call_local", "reliable")
 func start_game() -> void:
 	game_started.emit()
+	get_tree().change_scene_to_file("res://scenes/maps/LabFacility.tscn")
+
+var restart_votes = []
+
+@rpc("any_peer", "reliable")
+func vote_restart() -> void:
+	var sender_id = multiplayer.get_remote_sender_id()
+	if not sender_id in restart_votes:
+		restart_votes.append(sender_id)
+		print("Player ", sender_id, " voted to restart.")
+
+@rpc("authority", "call_local", "reliable")
+func restart_game() -> void:
+	restart_votes.clear()
+	# Optional: Reset player states if persistent, but reloading scene usually works
 	get_tree().change_scene_to_file("res://scenes/maps/LabFacility.tscn")

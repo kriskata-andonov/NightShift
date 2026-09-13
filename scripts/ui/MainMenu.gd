@@ -16,52 +16,16 @@ func _ready() -> void:
 		add_child(bg)
 		
 	# --- Premium Styling ---
-	var base_bg = Color(0.05, 0.05, 0.08, 0.7) # Dark glassy background
-	var neon_blue = Color(0.2, 0.8, 1.0)
-	var neon_hover = Color(0.4, 0.9, 1.0)
-	var text_color = Color(0.9, 0.9, 0.9)
-	
-	# Base Panel Style
-	var style_panel = StyleBoxFlat.new()
-	style_panel.bg_color = base_bg
-	style_panel.set_corner_radius_all(12)
-	style_panel.set_border_width_all(2)
-	style_panel.border_color = Color(0.1, 0.2, 0.3, 0.5)
-	style_panel.content_margin_top = 12
-	style_panel.content_margin_bottom = 12
-	style_panel.content_margin_left = 12
-	style_panel.content_margin_right = 12
-	
-	# Item List Style
-	var style_list = style_panel.duplicate()
-	style_list.bg_color = Color(0, 0, 0, 0.4)
-	style_list.content_margin_top = 6
-	style_list.content_margin_bottom = 6
-	style_list.content_margin_left = 6
-	style_list.content_margin_right = 6
-	
-	# Normal Button Style
-	var style_btn = StyleBoxFlat.new()
-	style_btn.bg_color = Color(0.1, 0.15, 0.25, 0.8)
-	style_btn.set_corner_radius_all(8)
-	style_btn.set_border_width_all(2)
-	style_btn.border_color = neon_blue * 0.5
-	style_btn.content_margin_top = 8
-	style_btn.content_margin_bottom = 8
-	style_btn.content_margin_left = 15
-	style_btn.content_margin_right = 15
-	
-	# Hover Button Style (Glowing)
-	var style_hover = style_btn.duplicate()
-	style_hover.bg_color = Color(0.15, 0.25, 0.4, 0.9)
-	style_hover.border_color = neon_hover
-	style_hover.shadow_color = neon_blue * 0.5
-	style_hover.shadow_size = 8
+	var style_panel = ThemeManager.get_panel_style()
+	var style_list = ThemeManager.get_list_style()
+	var style_btn = ThemeManager.get_btn_style()
+	var style_hover = ThemeManager.get_btn_hover_style()
+	var text_color = ThemeManager.TEXT_COLOR
 	
 	# Pressed Button Style
 	var style_pressed = style_btn.duplicate()
-	style_pressed.bg_color = neon_blue * 0.3
-	style_pressed.border_color = neon_blue
+	style_pressed.bg_color = ThemeManager.NEON_BLUE * 0.3
+	style_pressed.border_color = ThemeManager.NEON_BLUE
 	
 	# Input Style
 	var style_input = style_btn.duplicate()
@@ -100,10 +64,9 @@ func _ready() -> void:
 	# Title (Top Center)
 	var title = Label.new()
 	title.text = "NIGHT SHIFT"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 36)
-	title.add_theme_color_override("font_color", neon_hover)
-	title.add_theme_color_override("font_shadow_color", neon_blue * 0.5)
+	title.add_theme_font_size_override("font_size", 48)
+	title.add_theme_color_override("font_color", ThemeManager.NEON_HOVER)
+	title.add_theme_color_override("font_shadow_color", ThemeManager.NEON_BLUE * 0.5)
 	title.add_theme_constant_override("shadow_offset_x", 0)
 	title.add_theme_constant_override("shadow_offset_y", 2)
 	title.add_theme_constant_override("shadow_outline_size", 4)
@@ -164,8 +127,8 @@ func _ready() -> void:
 	start_btn = Button.new()
 	start_btn.text = "START SHIFT"
 	start_btn.disabled = true
-	start_btn.add_theme_font_size_override("font_size", 16)
-	start_btn.add_theme_color_override("font_color", neon_hover)
+	start_btn.add_theme_font_size_override("font_size", 24)
+	start_btn.add_theme_color_override("font_color", ThemeManager.NEON_HOVER)
 	start_btn.pressed.connect(_on_start_pressed)
 	controls_vbox.add_child(start_btn)
 	
@@ -187,10 +150,10 @@ func _ready() -> void:
 	lobby_panel.add_child(lobby_vbox)
 	
 	var lobby_title = Label.new()
-	lobby_title.text = "CREW LOBBY"
+	lobby_title.text = "CONNECTED PLAYERS"
 	lobby_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lobby_title.add_theme_font_size_override("font_size", 16)
-	lobby_title.add_theme_color_override("font_color", neon_hover)
+	lobby_title.add_theme_font_size_override("font_size", 20)
+	lobby_title.add_theme_color_override("font_color", ThemeManager.NEON_HOVER)
 	lobby_title.add_theme_constant_override("shadow_offset_y", 2)
 	lobby_vbox.add_child(lobby_title)
 	

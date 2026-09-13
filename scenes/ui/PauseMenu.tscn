@@ -1,0 +1,129 @@
+[gd_scene format=3 uid="uid://dpausemenu001"]
+
+[ext_resource type="Script" path="res://scripts/ui/PauseMenu.gd" id="1_script"]
+
+[node name="PauseMenu" type="CanvasLayer"]
+layer = 100
+script = ExtResource("1_script")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainPanel" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/MainPanel"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="Title" type="Label" parent="CenterContainer/MainPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "PAUSED"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/MainPanel/VBox"]
+layout_mode = 2
+
+[node name="BtnResume" type="Button" parent="CenterContainer/MainPanel/VBox"]
+layout_mode = 2
+text = "Resume"
+
+[node name="BtnRestart" type="Button" parent="CenterContainer/MainPanel/VBox"]
+layout_mode = 2
+text = "Restart Level"
+
+[node name="BtnSettings" type="Button" parent="CenterContainer/MainPanel/VBox"]
+layout_mode = 2
+text = "Settings"
+
+[node name="BtnExit" type="Button" parent="CenterContainer/MainPanel/VBox"]
+layout_mode = 2
+text = "Exit to Menu"
+
+[node name="SettingsPanel" type="PanelContainer" parent="CenterContainer"]
+visible = false
+custom_minimum_size = Vector2(400, 300)
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/SettingsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="Title" type="Label" parent="CenterContainer/SettingsPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "SETTINGS"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/SettingsPanel/VBox"]
+layout_mode = 2
+
+[node name="TabContainer" type="TabContainer" parent="CenterContainer/SettingsPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="General" type="VBoxContainer" parent="CenterContainer/SettingsPanel/VBox/TabContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Placeholder" type="Label" parent="CenterContainer/SettingsPanel/VBox/TabContainer/General"]
+layout_mode = 2
+text = "General settings coming soon..."
+horizontal_alignment = 1
+
+[node name="Audio" type="VBoxContainer" parent="CenterContainer/SettingsPanel/VBox/TabContainer"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="AudioLabel" type="Label" parent="CenterContainer/SettingsPanel/VBox/TabContainer/Audio"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "Audio Device:"
+
+[node name="DeviceOption" type="OptionButton" parent="CenterContainer/SettingsPanel/VBox/TabContainer/Audio"]
+layout_mode = 2
+
+[node name="HearMyselfCheck" type="CheckBox" parent="CenterContainer/SettingsPanel/VBox/TabContainer/Audio"]
+layout_mode = 2
+text = "Hear Myself (Debug)"
+
+[node name="MicBoostLabel" type="Label" parent="CenterContainer/SettingsPanel/VBox/TabContainer/Audio"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "Mic Boost:"
+
+[node name="MicBoostSlider" type="HSlider" parent="CenterContainer/SettingsPanel/VBox/TabContainer/Audio"]
+layout_mode = 2
+min_value = 1.0
+max_value = 10.0
+step = 0.5
+value = 1.0
+
+[node name="MicVolumeLabel" type="Label" parent="CenterContainer/SettingsPanel/VBox/TabContainer/Audio"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "Mic Activity:"
+
+[node name="MicVolumeBar" type="ProgressBar" parent="CenterContainer/SettingsPanel/VBox/TabContainer/Audio"]
+layout_mode = 2
+max_value = 1.0
+show_percentage = false
+
+[node name="BtnBack" type="Button" parent="CenterContainer/SettingsPanel/VBox"]
+layout_mode = 2
+text = "Back"
