@@ -2,6 +2,7 @@ extends CanvasLayer
 
 @onready var main_panel: PanelContainer = $CenterContainer/MainPanel
 @onready var settings_panel: PanelContainer = $CenterContainer/SettingsPanel
+@onready var general_tab: Control = $CenterContainer/SettingsPanel/VBox/TabContainer/General
 
 @onready var btn_resume: Button = $CenterContainer/MainPanel/VBox/BtnResume
 @onready var btn_restart: Button = $CenterContainer/MainPanel/VBox/BtnRestart
@@ -45,6 +46,27 @@ func _ready() -> void:
 		btn_restart.text = "Restart Level"
 	else:
 		btn_restart.text = "Vote Restart"
+		
+	_setup_general_tab()
+	ThemeManager.connect_audio_to_buttons(self)
+
+func _setup_general_tab() -> void:
+	for child in general_tab.get_children():
+		child.queue_free()
+		
+	var general_vbox = VBoxContainer.new()
+	general_vbox.add_theme_constant_override("separation", 10)
+	general_tab.add_child(general_vbox)
+	
+	var general_label = Label.new()
+	general_label.text = "Player Name (Cannot change during shift):"
+	general_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	general_vbox.add_child(general_label)
+	
+	var name_input = LineEdit.new()
+	name_input.text = NetworkManager.player_info.name
+	name_input.editable = false
+	general_vbox.add_child(name_input)
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
@@ -80,6 +102,11 @@ func _on_settings_pressed() -> void:
 	main_panel.hide()
 	settings_panel.show()
 	_populate_audio_devices()
+	
+	hear_myself_check.button_pressed = NetworkManager.hear_myself
+	mic_boost_slider.value = NetworkManager.mic_boost
+	
+	# Try to apply local voice volume instantly if we have one
 	var voice = _get_local_player_voice()
 	if voice:
 		hear_myself_check.button_pressed = voice.hear_myself
@@ -119,11 +146,13 @@ func _on_device_selected(index: int) -> void:
 		AudioServer.input_device = devices[index]
 
 func _on_hear_myself_toggled(toggled_on: bool) -> void:
+	NetworkManager.hear_myself = toggled_on
 	var voice = _get_local_player_voice()
 	if voice:
 		voice.hear_myself = toggled_on
 
 func _on_mic_boost_changed(value: float) -> void:
+	NetworkManager.mic_boost = value
 	var voice = _get_local_player_voice()
 	if voice:
 		voice.mic_boost = value

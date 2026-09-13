@@ -17,6 +17,9 @@ var tick_rate: float = 20.0
 var time_since_last_send: float = 0.0
 
 func _ready() -> void:
+	hear_myself = NetworkManager.hear_myself
+	mic_boost = NetworkManager.mic_boost
+
 	if player.is_multiplayer_authority():
 		mic_player = AudioStreamPlayer.new()
 		mic_player.stream = AudioStreamMicrophone.new()

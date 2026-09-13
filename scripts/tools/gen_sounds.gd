@@ -32,18 +32,18 @@ func _init() -> void:
 	click_stream.mix_rate = 44100
 	click_stream.stereo = false
 	var click_data = PackedByteArray()
-	var click_samples = int(44100.0 * 0.06) # 60ms
+	var click_samples = int(44100.0 * 0.05) # 50ms
 	for i in range(click_samples):
 		var t = float(i) / 44100.0
 		var progress = float(i) / click_samples
-		var freq = lerp(600.0, 500.0, progress)
+		var freq = lerp(800.0, 600.0, progress)
 		
 		var env = 1.0
 		if progress < 0.1: env = progress / 0.1
-		elif progress > 0.9: env = (1.0 - progress) / 0.1
+		elif progress > 0.8: env = (1.0 - progress) / 0.2
 		
-		var val = 1.0 if sin(2.0 * PI * freq * t) > 0 else -1.0
-		val = val * 0.3 * env
+		var val = sin(2.0 * PI * freq * t)
+		val = val * 0.4 * env
 		var int_val = int(val * 32767.0)
 		click_data.append(int_val & 0xFF)
 		click_data.append((int_val >> 8) & 0xFF)

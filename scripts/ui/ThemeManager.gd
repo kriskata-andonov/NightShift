@@ -60,3 +60,29 @@ static func apply_button_theme(btn: Button) -> void:
 		btn.mouse_entered.connect(NetworkManager.play_ui_hover)
 	if not btn.pressed.is_connected(NetworkManager.play_ui_click):
 		btn.pressed.connect(NetworkManager.play_ui_click)
+
+static func _on_btn_hover(btn: BaseButton) -> void:
+	if not btn.disabled: NetworkManager.play_ui_hover()
+
+static func _on_btn_click(btn: BaseButton) -> void:
+	if not btn.disabled: NetworkManager.play_ui_click()
+
+static func connect_audio_to_buttons(node: Node) -> void:
+	if node is BaseButton:
+		if not node.mouse_entered.is_connected(_on_btn_hover.bind(node)):
+			node.mouse_entered.connect(_on_btn_hover.bind(node))
+		if not node.pressed.is_connected(_on_btn_click.bind(node)):
+			node.pressed.connect(_on_btn_click.bind(node))
+			
+		if node is OptionButton:
+			if not node.item_selected.is_connected(NetworkManager.play_ui_click.unbind(1)):
+				node.item_selected.connect(NetworkManager.play_ui_click.unbind(1))
+				
+	elif node is TabContainer or node is TabBar:
+		if not node.tab_changed.is_connected(NetworkManager.play_ui_click.unbind(1)):
+			node.tab_changed.connect(NetworkManager.play_ui_click.unbind(1))
+		if not node.tab_hovered.is_connected(NetworkManager.play_ui_hover.unbind(1)):
+			node.tab_hovered.connect(NetworkManager.play_ui_hover.unbind(1))
+	
+	for child in node.get_children():
+		connect_audio_to_buttons(child)

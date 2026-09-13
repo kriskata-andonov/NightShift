@@ -81,6 +81,7 @@ drop_item={
 
 [audio]
 
+buses/default_bus_layout="uid://dpsa4nbl8rff"
 driver/enable_input=true
 
 [autoload]
