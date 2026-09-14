@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://bg8n5m4l9x3j1"]
+
+[ext_resource type="Script" path="res://scripts/objects/Generator.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/interaction/Interactable.gd" id="2_interact"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gen"]
+albedo_color = Color(0.8, 0.2, 0.1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_shape"]
+size = Vector3(2, 2, 2)
+
+[node name="Generator" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Geometry" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+size = Vector3(2, 2, 2)
+material = SubResource("StandardMaterial3D_gen")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Geometry"]
+collision_layer = 5
+script = ExtResource("2_interact")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/StaticBody3D"]
+shape = SubResource("BoxShape3D_shape")

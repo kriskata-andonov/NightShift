@@ -140,6 +140,14 @@ func has_item(item_name: String) -> bool:
 			return true
 	return false
 
+## Remove the first occurrence of an item by name and return true if successful.
+func remove_item_by_name(item_name: String) -> bool:
+	for i in range(max_slots):
+		if items[i] and items[i].item_name == item_name:
+			remove_item(i)
+			return true
+	return false
+
 ## Count how many of a given item name are in the inventory.
 func get_item_count(item_name: String) -> int:
 	var count := 0

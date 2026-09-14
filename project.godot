@@ -87,6 +87,7 @@ driver/enable_input=true
 [autoload]
 
 NetworkManager="*res://scripts/systems/NetworkManager.gd"
+LevelState="*res://scripts/systems/LevelState.gd"
 
 [display]
 
