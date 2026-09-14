@@ -96,6 +96,45 @@ script = ExtResource("11_dmg")
 [node name="DownedHUD" type="Label" parent="InteractionUI" unique_id=1220211714]
 script = ExtResource("12_down")
 
+[node name="DebugHUD" type="PanelContainer" parent="InteractionUI"]
+visible = false
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -220.0
+offset_top = 20.0
+offset_right = 220.0
+offset_bottom = 110.0
+grow_horizontal = 2
+
+[node name="DebugLabel" type="Label" parent="InteractionUI/DebugHUD"]
+layout_mode = 2
+text = "[ DEBUG FREECAM ACTIVE ]
+Fly: WASD | Up/Down: Space/Ctrl | Sprint: Shift
+[P]: Toggle Power
+Type 'BUG' to exit"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CheatToast" type="Label" parent="InteractionUI"]
+visible = false
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -250.0
+offset_top = 130.0
+offset_right = 250.0
+offset_bottom = 170.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.2, 1, 0.5, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 22
+text = "[ CHEAT ACTIVATED ]"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="PlayerInventory" type="Node" parent="." unique_id=1240264930]
 script = ExtResource("6_inv")
 

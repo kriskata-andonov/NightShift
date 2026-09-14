@@ -22,7 +22,10 @@ func _process(delta: float) -> void:
 		if absf(rotation_degrees.y - target_rotation_y) < 0.5:
 			rotation_degrees.y = target_rotation_y
 
-func interact(_player: Node) -> void:
+func interact(player: Node) -> void:
+	if player and player.has_method("set_last_room") and player is Node3D:
+		player.set_last_room("Doorway: " + name, player.global_position)
+
 	if multiplayer.has_multiplayer_peer():
 		# Multiplayer: ask the server to toggle
 		if multiplayer.is_server():

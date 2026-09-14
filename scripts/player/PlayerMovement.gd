@@ -41,6 +41,25 @@ var current_stamina: float = 100.0
 var is_sprinting: bool = false
 var is_exhausted: bool = false
 
+## Debug FreeCam settings
+@export var debug_speed: float = 12.0
+@export var debug_sprint_speed: float = 28.0
+var is_debug_cam: bool = false
+var debug_hud: Control = null
+
+## Anti-Void & Room Tracking
+var last_room: String = "Entrance Elevator"
+var last_room_position: Vector3 = Vector3(0, 1.0, 0)
+var void_teleport_y_threshold: float = -20.0
+
+## Debug Ambient Light state
+var _debug_ambient_enabled: bool = false
+var _orig_world_env_ref: WorldEnvironment = null
+var _orig_ambient_source: int = 0
+var _orig_ambient_color: Color = Color.BLACK
+var _orig_ambient_energy: float = 1.0
+var _cached_orig_settings: bool = false
+
 # Get the gravity from the project settings, then scale it.
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
@@ -51,6 +70,8 @@ var exhausted_audio: AudioStreamPlayer3D = null
 
 func _enter_tree() -> void:
 	var peer_id = name.to_int()
+	if peer_id == 0:
+		peer_id = 1
 	set_multiplayer_authority(peer_id)
 	
 	var sync = get_node_or_null("MultiplayerSynchronizer")
@@ -82,6 +103,15 @@ func _ready() -> void:
 		camera.fov = normal_fov
 	# Find health node for downed state checks
 	health_node = get_node_or_null("PlayerHealth")
+
+	# Connect to CheatCodeManager
+	var cheat_mgr = get_node_or_null("CheatCodeManager")
+	if cheat_mgr:
+		cheat_mgr.cheat_activated.connect(_on_cheat)
+		
+	var ui = get_node_or_null("InteractionUI")
+	if ui:
+		debug_hud = ui.get_node_or_null("DebugHUD")
 
 	# Apply Class Modifiers
 	if character_class == PlayerClass.ATHLETE:
@@ -115,10 +145,25 @@ func _ready() -> void:
 	if camera:
 		camera.current = true
 
+	last_room_position = global_position
+	last_room_position.y = maxf(last_room_position.y, 0.5)
 
+func _exit_tree() -> void:
+	if _debug_ambient_enabled:
+		_apply_debug_ambient_light(false)
 
 func _physics_process(delta: float) -> void:
-	if not is_multiplayer_authority():
+	if is_inside_tree() and multiplayer and multiplayer.has_multiplayer_peer() and not is_multiplayer_authority():
+		return
+		
+	# Anti-void protection: recover player if fallen/glitched below y = -20
+	var current_y = global_position.y if is_inside_tree() else position.y
+	if current_y < void_teleport_y_threshold:
+		_recover_from_void()
+		return
+		
+	if is_debug_cam:
+		_process_debug_cam_movement(delta)
 		return
 		
 	var is_player_downed: bool = health_node and health_node.is_downed()
@@ -247,3 +292,213 @@ func get_interaction_time_multiplier() -> float:
 	if character_class == PlayerClass.ENGINEER:
 		return 0.7
 	return 1.0
+
+func _is_debug_key_down(key: Key) -> bool:
+	return Input.is_physical_key_pressed(key) or Input.is_key_pressed(key)
+
+func _unhandled_input(event: InputEvent) -> void:
+	if is_inside_tree() and multiplayer and multiplayer.has_multiplayer_peer() and not is_multiplayer_authority():
+		return
+		
+	if is_debug_cam and event is InputEventKey and event.pressed and not event.echo:
+		var is_p = (event.keycode == KEY_P or event.physical_keycode == KEY_P or event.key_label == KEY_P)
+		var is_l = (event.keycode == KEY_L or event.physical_keycode == KEY_L or event.key_label == KEY_L)
+		if is_p:
+			_toggle_facility_power()
+		elif is_l:
+			_toggle_debug_ambient_light()
+
+func _on_cheat(code: String) -> void:
+	if code == "bug":
+		toggle_debug_cam()
+	elif code == "pow":
+		_toggle_facility_power()
+	elif code == "lit":
+		_toggle_debug_ambient_light()
+
+func toggle_debug_cam() -> void:
+	is_debug_cam = !is_debug_cam
+	var col = get_node_or_null("CollisionShape3D")
+	if col:
+		col.disabled = is_debug_cam
+	velocity = Vector3.ZERO
+	_apply_debug_ambient_light(is_debug_cam)
+	_update_debug_hud()
+	print("[DEBUG] FreeCam toggled: ", is_debug_cam)
+
+func _process_debug_cam_movement(delta: float) -> void:
+	var cam_basis = camera.global_transform.basis if camera else global_transform.basis
+	var move_dir = Vector3.ZERO
+	
+	if _is_debug_key_down(KEY_W):
+		move_dir -= cam_basis.z
+	if _is_debug_key_down(KEY_S):
+		move_dir += cam_basis.z
+	if _is_debug_key_down(KEY_A):
+		move_dir -= cam_basis.x
+	if _is_debug_key_down(KEY_D):
+		move_dir += cam_basis.x
+		
+	if _is_debug_key_down(KEY_SPACE):
+		move_dir += Vector3.UP
+	if _is_debug_key_down(KEY_CTRL) or _is_debug_key_down(KEY_C):
+		move_dir -= Vector3.UP
+		
+	if move_dir.length_squared() > 0.001:
+		move_dir = move_dir.normalized()
+		
+	var speed = debug_sprint_speed if _is_debug_key_down(KEY_SHIFT) else debug_speed
+	global_position += move_dir * speed * delta
+	velocity = Vector3.ZERO
+
+func _toggle_facility_power() -> void:
+	var tree: SceneTree = get_tree() if is_inside_tree() else (Engine.get_main_loop() as SceneTree)
+	var state = tree.root.get_node_or_null("LevelState") if (tree and tree.root) else get_node_or_null("/root/LevelState")
+	if not state:
+		print("LevelState singleton not found!")
+		return
+		
+	if state.has_method("debug_toggle_power"):
+		if is_inside_tree() and multiplayer and multiplayer.has_multiplayer_peer():
+			state.debug_toggle_power.rpc()
+		else:
+			state.debug_toggle_power()
+	else:
+		state.is_power_on = !state.is_power_on
+		if state.is_power_on:
+			state.fuses_installed = state.fuses_required
+			if state.has_signal("power_restored"):
+				state.power_restored.emit()
+		if state.has_signal("power_changed"):
+			state.power_changed.emit(state.is_power_on)
+			
+	var power_txt = "ON" if state.is_power_on else "OFF"
+	print("[DEBUG] Facility power toggled: ", power_txt)
+	show_toast("[ FACILITY POWER: " + power_txt + " ]", 2.0)
+	_update_debug_hud()
+
+func _update_debug_hud() -> void:
+	if not debug_hud:
+		var ui = get_node_or_null("InteractionUI")
+		if ui:
+			debug_hud = ui.get_node_or_null("DebugHUD")
+	if not debug_hud:
+		return
+		
+	debug_hud.visible = is_debug_cam
+	if is_debug_cam:
+		var is_on = false
+		var tree: SceneTree = get_tree() if is_inside_tree() else (Engine.get_main_loop() as SceneTree)
+		var state = tree.root.get_node_or_null("LevelState") if (tree and tree.root) else get_node_or_null("/root/LevelState")
+		if state:
+			is_on = state.is_power_on
+		var label = debug_hud.get_node_or_null("DebugLabel") as Label
+		if label:
+			var power_str = "ON" if is_on else "OFF"
+			var light_str = "ON (83,83,83 @ 2.5)" if _debug_ambient_enabled else "OFF"
+			label.text = "[ DEBUG FREECAM ACTIVE ]\nFly: WASD | Up/Down: Space/Ctrl | Sprint: Shift\n[P]: Toggle Power (%s) | [L]: Ambient Light (%s)\nType 'BUG' to exit" % [power_str, light_str]
+
+## Updates the player's last safe room checkpoint
+func set_last_room(room_identifier: Variant, pos: Vector3 = Vector3.INF) -> void:
+	if room_identifier is String:
+		last_room = room_identifier
+	elif room_identifier is Node:
+		last_room = room_identifier.name
+	else:
+		last_room = str(room_identifier)
+		
+	if not pos.is_finite():
+		last_room_position = global_position if is_inside_tree() else position
+	else:
+		last_room_position = pos
+		
+	last_room_position.y = maxf(last_room_position.y, 0.5)
+	print("[AntiVoid] Checkpoint updated: '", last_room, "' at ", last_room_position)
+
+## Teleports player back to the last safe room if they fall into the void
+func _recover_from_void() -> void:
+	velocity = Vector3.ZERO
+	if is_inside_tree():
+		global_position = last_room_position
+		global_position.y = maxf(global_position.y, 0.5)
+	else:
+		position = last_room_position
+		position.y = maxf(position.y, 0.5)
+	print("[AntiVoid] Player fell into void (y < %.1f)! Teleporting back to '%s' at %v" % [void_teleport_y_threshold, last_room, last_room_position])
+	show_toast("[ RESCUED FROM VOID: " + last_room + " ]")
+
+## Displays on-screen notification using CheatToast
+func show_toast(msg: String, duration: float = 2.5) -> void:
+	var toast = get_node_or_null("InteractionUI/CheatToast") as Label
+	if not toast:
+		var ui = get_node_or_null("InteractionUI")
+		if ui:
+			toast = ui.get_node_or_null("CheatToast") as Label
+	if toast:
+		toast.text = msg
+		toast.visible = true
+		get_tree().create_timer(duration).timeout.connect(func():
+			if is_instance_valid(toast) and toast.text == msg:
+				toast.visible = false
+		)
+
+func _find_world_environment() -> WorldEnvironment:
+	var tree: SceneTree = get_tree() if is_inside_tree() else (Engine.get_main_loop() as SceneTree)
+	if not tree:
+		return null
+	if tree.current_scene:
+		if tree.current_scene is WorldEnvironment:
+			return tree.current_scene
+		var env = tree.current_scene.find_child("WorldEnvironment", true, false) as WorldEnvironment
+		if env:
+			return env
+	if tree.root:
+		for child in tree.root.get_children():
+			if child is WorldEnvironment:
+				return child
+			var env = child.find_child("WorldEnvironment", true, false) as WorldEnvironment
+			if env:
+				return env
+	return null
+
+## Applies ambient light boost (Color8(83, 83, 83), energy = 2.5) during debug mode
+func _apply_debug_ambient_light(enable: bool) -> void:
+	_debug_ambient_enabled = enable
+	var world_env: WorldEnvironment = _find_world_environment()
+	if world_env and world_env.environment:
+		if enable:
+			if not _cached_orig_settings:
+				_orig_world_env_ref = world_env
+				_orig_ambient_source = world_env.environment.ambient_light_source
+				_orig_ambient_color = world_env.environment.ambient_light_color
+				_orig_ambient_energy = world_env.environment.ambient_light_energy
+				_cached_orig_settings = true
+			world_env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+			world_env.environment.ambient_light_color = Color8(83, 83, 83)
+			world_env.environment.ambient_light_energy = 2.5
+			print("[DEBUG] Ambient light enabled on WorldEnvironment: Color8(83, 83, 83), energy = 2.5")
+		else:
+			if _cached_orig_settings and is_instance_valid(_orig_world_env_ref) and _orig_world_env_ref.environment:
+				_orig_world_env_ref.environment.ambient_light_source = _orig_ambient_source
+				_orig_world_env_ref.environment.ambient_light_color = _orig_ambient_color
+				_orig_world_env_ref.environment.ambient_light_energy = _orig_ambient_energy
+				_cached_orig_settings = false
+				print("[DEBUG] Ambient light restored on WorldEnvironment")
+	elif camera:
+		if enable:
+			var cam_env = camera.environment
+			if not cam_env:
+				cam_env = Environment.new()
+				cam_env.background_mode = Environment.BG_CLEAR_COLOR
+				camera.environment = cam_env
+			cam_env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+			cam_env.ambient_light_color = Color8(83, 83, 83)
+			cam_env.ambient_light_energy = 2.5
+			print("[DEBUG] Ambient light enabled on Camera3D: Color8(83, 83, 83), energy = 2.5")
+		else:
+			camera.environment = null
+			print("[DEBUG] Ambient light restored on Camera3D")
+
+func _toggle_debug_ambient_light() -> void:
+	_apply_debug_ambient_light(!_debug_ambient_enabled)
+	_update_debug_hud()
