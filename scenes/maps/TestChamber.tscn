@@ -118,6 +118,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 0)
 
 [node name="ExitElevator" parent="." unique_id=987654324 instance=ExtResource("11_elevator")]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 12, 0, 0)
+is_exit = true
 
 [node name="DummyModel" type="Node3D" parent="." unique_id=1084901299]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.5, -2)

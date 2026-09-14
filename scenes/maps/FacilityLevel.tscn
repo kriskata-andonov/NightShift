@@ -1,13 +1,14 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene format=3 uid="uid://ccnaa4flbp88y"]
 
-[ext_resource type="Script" path="res://scripts/maps/FacilityLevel.gd" id="1_script"]
-[ext_resource type="Script" path="res://scripts/core/LevelGenerator.gd" id="2_script"]
+[ext_resource type="Script" uid="uid://cuvduyu18qchp" path="res://scripts/maps/FacilityLevel.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://b21eawpqyk36c" path="res://scripts/core/LevelGenerator.gd" id="2_script"]
 
 [sub_resource type="Environment" id="Environment_p5lce"]
 background_mode = 1
 background_color = Color(0.01, 0.01, 0.01, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.02, 0.02, 0.02, 1)
+ambient_light_color = Color(0.3254902, 0.3254902, 0.3254902, 0.4862745)
+ambient_light_energy = 0.54
 volumetric_fog_enabled = true
 volumetric_fog_density = 0.02
 
@@ -15,17 +16,17 @@ volumetric_fog_density = 0.02
 geometry_parsed_geometry_type = 1
 agent_radius = 0.6
 
-[node name="FacilityLevel" type="Node3D"]
+[node name="FacilityLevel" type="Node3D" unique_id=1767362196]
 script = ExtResource("1_script")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=151271208]
 environment = SubResource("Environment_p5lce")
 
-[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=721124626]
 navigation_mesh = SubResource("NavigationMesh_8mt7p")
 
-[node name="LevelGenerator" type="Node3D" parent="NavigationRegion3D"]
+[node name="LevelGenerator" type="Node3D" parent="NavigationRegion3D" unique_id=1306107053]
 script = ExtResource("2_script")
 
-[node name="PlayerSpawner" type="MultiplayerSpawner" parent="."]
+[node name="PlayerSpawner" type="MultiplayerSpawner" parent="." unique_id=2139699875]
 spawn_path = NodePath("..")

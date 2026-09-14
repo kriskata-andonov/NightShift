@@ -41,51 +41,141 @@ func generate_level(new_seed: int, new_floor: int) -> void:
 	_clear_level()
 	print("Generating Level with seed: ", seed_val)
 	
-	var grid_layout = {}
-	
-	# Start Elevator at (0,0), opens North
-	grid_layout[Vector2i(0,0)] = FLAG_N
-	var current = Vector2i(0, -1)
-	grid_layout[current] = FLAG_S
-	
 	var target_len = 5 + floor_num * 2
-	var end_pos = _random_walk(grid_layout, current, target_len)
+	var min_cells = 4 + floor_num * 2
+	var grid_layout = {}
+	var attempts = 0
+	
+	# Attempt main walk with validation for minimum path length
+	while attempts < 10:
+		attempts += 1
+		grid_layout.clear()
+		
+		# Start Elevator at (0,0), opens North
+		grid_layout[Vector2i(0,0)] = FLAG_N
+		var current = Vector2i(0, -1)
+		grid_layout[current] = FLAG_S
+		
+		_random_walk(grid_layout, current, target_len)
+		if grid_layout.size() >= min_cells:
+			break
 	
 	# Add branches
 	var all_cells = grid_layout.keys().duplicate()
 	for cell in all_cells:
-		if cell != Vector2i(0,0) and cell != end_pos:
+		if cell != Vector2i(0,0):
 			if rng.randf() < 0.4:
 				_random_walk(grid_layout, cell, rng.randi_range(1, 3))
 				
+	# Calculate topological BFS distances from start (0,0) to place exit elevator
+	var distances = _calculate_bfs_distances(grid_layout, Vector2i(0, 0))
+	var end_pos = _select_exit_position(grid_layout, distances)
+	
+	# Add loops between adjacent rooms (excludes start and exit elevators)
+	_add_loops(grid_layout, end_pos, 0.3)
+	
 	_spawn_layout(grid_layout, end_pos)
-	print("Level generation complete.")
+	print("Level generation complete. Total rooms: ", grid_layout.size(), " Exit at: ", end_pos)
 
 func _random_walk(layout: Dictionary, start: Vector2i, steps: int) -> Vector2i:
 	var current = start
 	for i in range(steps):
 		var allowed = []
 		for d in [DIR_N, DIR_E, DIR_W, DIR_S]:
-			# Biased towards North
-			if d == DIR_N:
-				allowed.append(d)
-				allowed.append(d)
 			if not layout.has(current + d):
 				allowed.append(d)
+				# Biased towards North only if North is truly available
+				if d == DIR_N:
+					allowed.append(d)
+					allowed.append(d)
 				
 		if allowed.is_empty():
 			break
 			
 		var dir = allowed[rng.randi() % allowed.size()]
 		var next_cell = current + dir
-		if layout.has(next_cell):
-			break # Hit existing path, just connect and stop branch
-			
+		
 		if not layout.has(current): layout[current] = 0
 		layout[current] |= _dir_to_flag(dir)
 		layout[next_cell] = _dir_to_flag(_opposite_dir(dir))
 		current = next_cell
 	return current
+
+func _calculate_bfs_distances(layout: Dictionary, start: Vector2i) -> Dictionary:
+	var distances = { start: 0 }
+	var queue: Array[Vector2i] = [start]
+	
+	while not queue.is_empty():
+		var curr = queue.pop_front()
+		var mask = layout.get(curr, 0)
+		var current_dist = distances[curr]
+		
+		for d in [DIR_N, DIR_E, DIR_S, DIR_W]:
+			var flag = _dir_to_flag(d)
+			if (mask & flag) != 0:
+				var neighbor = curr + d
+				if layout.has(neighbor) and not distances.has(neighbor):
+					distances[neighbor] = current_dist + 1
+					queue.append(neighbor)
+					
+	return distances
+
+func _select_exit_position(layout: Dictionary, distances: Dictionary) -> Vector2i:
+	var best_end_pos = Vector2i.ZERO
+	var max_dist = -1
+	
+	# Prefer dead-end rooms (rooms with only 1 connection) for the elevator
+	for cell in layout.keys():
+		if cell == Vector2i(0, 0) or cell == Vector2i(0, -1):
+			continue
+		var mask = layout[cell]
+		if mask in [FLAG_N, FLAG_E, FLAG_S, FLAG_W]:
+			var dist = distances.get(cell, -1)
+			if dist > max_dist:
+				max_dist = dist
+				best_end_pos = cell
+				
+	# Fallback if no dead-end was found: pick the furthest room and append an elevator cell
+	if best_end_pos == Vector2i.ZERO:
+		for cell in layout.keys():
+			if cell == Vector2i(0, 0) or cell == Vector2i(0, -1):
+				continue
+			var dist = distances.get(cell, -1)
+			if dist > max_dist:
+				max_dist = dist
+				best_end_pos = cell
+				
+		var mask = layout.get(best_end_pos, 0)
+		if not (mask in [FLAG_N, FLAG_E, FLAG_S, FLAG_W]):
+			for d in [DIR_N, DIR_E, DIR_S, DIR_W]:
+				var cand = best_end_pos + d
+				if not layout.has(cand):
+					layout[best_end_pos] |= _dir_to_flag(d)
+					layout[cand] = _dir_to_flag(_opposite_dir(d))
+					best_end_pos = cand
+					break
+					
+	return best_end_pos
+
+func _add_loops(layout: Dictionary, end_pos: Vector2i, loop_chance: float = 0.3) -> void:
+	var cells = layout.keys().duplicate()
+	for cell in cells:
+		if cell == Vector2i(0, 0) or cell == end_pos:
+			continue
+			
+		# Check East and South neighbors so each boundary is checked once
+		for d in [DIR_E, DIR_S]:
+			var neighbor = cell + d
+			if neighbor == Vector2i(0, 0) or neighbor == end_pos:
+				continue
+				
+			if layout.has(neighbor):
+				var flag = _dir_to_flag(d)
+				var is_connected = (layout[cell] & flag) != 0
+				if not is_connected:
+					if rng.randf() < loop_chance:
+						layout[cell] |= flag
+						layout[neighbor] |= _dir_to_flag(_opposite_dir(d))
 
 func _dir_to_flag(dir: Vector2i) -> int:
 	if dir == DIR_N: return FLAG_N
@@ -108,10 +198,10 @@ func _spawn_layout(layout: Dictionary, end_pos: Vector2i) -> void:
 			rot = 0.0
 		elif pos == end_pos:
 			type = "elevator"
-			if mask & FLAG_N: rot = PI
-			elif mask & FLAG_S: rot = 0.0
-			elif mask & FLAG_E: rot = PI/2
-			elif mask & FLAG_W: rot = -PI/2
+			if mask & FLAG_N: rot = 0.0
+			elif mask & FLAG_S: rot = PI
+			elif mask & FLAG_E: rot = -PI / 2.0
+			elif mask & FLAG_W: rot = PI / 2.0
 		else:
 			match mask:
 				1, 4, 5: # N, S, N|S
@@ -151,7 +241,9 @@ func _spawn_layout(layout: Dictionary, end_pos: Vector2i) -> void:
 					type = "corridor"
 		
 		if type != "":
-			_spawn_module(pos, type, rot)
+			var inst = _spawn_module(pos, type, rot)
+			if type == "elevator" and inst.has_method("setup_elevator_type"):
+				inst.setup_elevator_type(pos == end_pos)
 			
 	# After all spawned, place caps on open sockets
 	for pos in grid_instances.keys():
@@ -160,17 +252,23 @@ func _spawn_layout(layout: Dictionary, end_pos: Vector2i) -> void:
 		if pos != Vector2i(0,0) and pos != end_pos:
 			_cap_open_sockets(room, mask)
 			
-	# Spawn interactive doors at chunk boundaries
+	# Spawn interactive doors at chunk boundaries (between standard rooms)
 	for pos in layout.keys():
+		if pos == Vector2i(0, 0) or pos == end_pos:
+			continue
 		var mask = layout[pos]
 		
 		if (mask & FLAG_S):
-			if rng.randf() < 0.6: # 60% chance for a door
-				_spawn_door(pos, DIR_S)
+			var neighbor = pos + DIR_S
+			if neighbor != Vector2i(0, 0) and neighbor != end_pos:
+				if rng.randf() < 0.6: # 60% chance for a door
+					_spawn_door(pos, DIR_S)
 				
 		if (mask & FLAG_E):
-			if rng.randf() < 0.6:
-				_spawn_door(pos, DIR_E)
+			var neighbor = pos + DIR_E
+			if neighbor != Vector2i(0, 0) and neighbor != end_pos:
+				if rng.randf() < 0.6:
+					_spawn_door(pos, DIR_E)
 				
 	_spawn_power_objects(end_pos)
 
@@ -204,7 +302,9 @@ func _spawn_power_objects(end_pos: Vector2i) -> void:
 		fuse.item_data = load("res://resources/items/Fuse.tres")
 		fuse.name = "Fuse_%d_%d" % [pos.x, pos.y]
 		room.add_child(fuse)
-		fuse.position = Vector3(rng.randf_range(-4, 4), 0.5, rng.randf_range(-4, 4))
+		var offset_x = rng.randf_range(-1.5, 1.5)
+		var offset_z = rng.randf_range(-6.0, 6.0)
+		fuse.position = Vector3(offset_x, 0.5, offset_z)
 
 func _spawn_door(grid_pos: Vector2i, dir: Vector2i) -> void:
 	var door = modules["door"].instantiate() as Node3D
@@ -219,6 +319,19 @@ func _spawn_door(grid_pos: Vector2i, dir: Vector2i) -> void:
 		door.position = base_pos + Vector3(GRID_SIZE / 2.0, 0, 0)
 		door.rotation.y = PI / 2.0
 
+	var next_pos = grid_pos + dir
+	var room_a = grid_instances.get(grid_pos)
+	var room_b = grid_instances.get(next_pos)
+	
+	if "room_a_name" in door:
+		door.room_a_name = room_a.name if room_a else ("Room_%d_%d" % [grid_pos.x, grid_pos.y])
+	if "room_b_name" in door:
+		door.room_b_name = room_b.name if room_b else ("Room_%d_%d" % [next_pos.x, next_pos.y])
+	if "room_a_pos" in door:
+		door.room_a_pos = Vector3(grid_pos.x * GRID_SIZE, 0.5, grid_pos.y * GRID_SIZE)
+	if "room_b_pos" in door:
+		door.room_b_pos = Vector3(next_pos.x * GRID_SIZE, 0.5, next_pos.y * GRID_SIZE)
+
 func _cap_open_sockets(room: Node3D, mask: int) -> void:
 	var sockets = room.get_node_or_null("Sockets")
 	if not sockets: return
@@ -232,7 +345,7 @@ func _cap_open_sockets(room: Node3D, mask: int) -> void:
 		
 		if socket_dir_local == Vector3.ZERO: continue
 		
-		var socket_dir_global = room.global_transform.basis * socket_dir_local
+		var socket_dir_global = room.transform.basis * socket_dir_local
 		var global_dir_flag = 0
 		if socket_dir_global.z < -0.5: global_dir_flag = FLAG_N
 		elif socket_dir_global.z > 0.5: global_dir_flag = FLAG_S
@@ -248,17 +361,18 @@ func _cap_open_sockets(room: Node3D, mask: int) -> void:
 			if child.name.ends_with("_E") or child.name.ends_with("_W"):
 				cap.rotation.y += PI / 2.0
 
-func _spawn_module(grid_pos: Vector2i, type: String, rot_rad: float) -> void:
+func _spawn_module(grid_pos: Vector2i, type: String, rot_rad: float) -> Node3D:
 	var instance = modules[type].instantiate() as Node3D
 	instance.name = "%s_%d_%d" % [type, grid_pos.x, grid_pos.y]
 	add_child(instance)
 	instance.position = Vector3(grid_pos.x * GRID_SIZE, 0, grid_pos.y * GRID_SIZE)
 	instance.rotation.y = rot_rad
 	grid_instances[grid_pos] = instance
+	return instance
 
 func _clear_level() -> void:
 	for child in get_children():
-		child.queue_free()
+		child.free()
 	grid_instances.clear()
 
 func get_room(grid_pos: Vector2i) -> RoomModule:
