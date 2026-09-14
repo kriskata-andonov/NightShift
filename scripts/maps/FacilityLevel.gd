@@ -6,6 +6,10 @@ var player_scene = preload("res://scenes/player/Player.tscn")
 @onready var generator = $NavigationRegion3D/LevelGenerator
 
 func _ready() -> void:
+	var state = get_tree().root.get_node_or_null("LevelState")
+	if state and state.has_method("reset"):
+		state.reset()
+		
 	NetworkManager.player_disconnected.connect(_on_player_disconnected)
 	
 	var spawner = get_node_or_null("PlayerSpawner")

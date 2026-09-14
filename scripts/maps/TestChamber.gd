@@ -3,6 +3,10 @@ extends Node3D
 var player_scene = preload("res://scenes/player/Player.tscn")
 
 func _ready() -> void:
+	var state = get_tree().root.get_node_or_null("LevelState")
+	if state and state.has_method("reset"):
+		state.reset()
+		
 	NetworkManager.player_disconnected.connect(_on_player_disconnected)
 	
 	# Register spawnable scenes explicitly in code. This avoids any Godot 4 UID/path serialization bugs.

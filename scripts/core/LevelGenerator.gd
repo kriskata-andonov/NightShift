@@ -241,9 +241,10 @@ func _spawn_layout(layout: Dictionary, end_pos: Vector2i) -> void:
 					type = "corridor"
 		
 		if type != "":
-			var inst = _spawn_module(pos, type, rot)
+			var is_exit_elev = (type == "elevator" and pos == end_pos)
+			var inst = _spawn_module(pos, type, rot, is_exit_elev)
 			if type == "elevator" and inst.has_method("setup_elevator_type"):
-				inst.setup_elevator_type(pos == end_pos)
+				inst.setup_elevator_type(is_exit_elev)
 			
 	# After all spawned, place caps on open sockets
 	for pos in grid_instances.keys():
@@ -361,9 +362,11 @@ func _cap_open_sockets(room: Node3D, mask: int) -> void:
 			if child.name.ends_with("_E") or child.name.ends_with("_W"):
 				cap.rotation.y += PI / 2.0
 
-func _spawn_module(grid_pos: Vector2i, type: String, rot_rad: float) -> Node3D:
+func _spawn_module(grid_pos: Vector2i, type: String, rot_rad: float, is_exit_elev: bool = false) -> Node3D:
 	var instance = modules[type].instantiate() as Node3D
 	instance.name = "%s_%d_%d" % [type, grid_pos.x, grid_pos.y]
+	if type == "elevator" and "is_exit" in instance:
+		instance.is_exit = is_exit_elev
 	add_child(instance)
 	instance.position = Vector3(grid_pos.x * GRID_SIZE, 0, grid_pos.y * GRID_SIZE)
 	instance.rotation.y = rot_rad

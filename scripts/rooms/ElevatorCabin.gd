@@ -50,8 +50,8 @@ func setup_elevator_type(exit_type: bool) -> void:
 	is_exit = exit_type
 	_update_visuals()
 
-func _on_power_changed(_powered: bool) -> void:
-	_update_visuals()
+func _on_power_changed(powered: bool) -> void:
+	_update_visuals(powered)
 
 func _init_visual_nodes() -> void:
 	if not panel_inside:
@@ -83,6 +83,17 @@ func _init_visual_nodes() -> void:
 	if not tunnel_light:
 		tunnel_light = get_node_or_null("Geometry/TunnelEntrance/TunnelSign/TunnelSignLight")
 
+func _set_status_mesh_emission(col: Color, energy: float) -> void:
+	if not status_mesh: return
+	var mat = status_mesh.material as StandardMaterial3D
+	if not mat or mat.resource_path != "": # if shared or unassigned, duplicate/instantiate
+		mat = (mat.duplicate() as StandardMaterial3D) if mat else StandardMaterial3D.new()
+		status_mesh.material = mat
+	mat.albedo_color = col
+	mat.emission_enabled = true
+	mat.emission = col
+	mat.emission_energy_multiplier = energy
+
 func _set_button_emission(btn_node: Node, col: Color, energy: float) -> void:
 	if not btn_node: return
 	var parent = btn_node.get_parent()
@@ -98,13 +109,13 @@ func _set_button_emission(btn_node: Node, col: Color, energy: float) -> void:
 			mat = mesh.material_override as StandardMaterial3D
 			if not mat:
 				mat = mesh.get_active_material(0) as StandardMaterial3D
-			if not mat:
-				mat = StandardMaterial3D.new()
+			if not mat or mat.resource_path != "":
+				mat = (mat.duplicate() as StandardMaterial3D) if mat else StandardMaterial3D.new()
 				mesh.material_override = mat
 		elif "material" in mesh:
 			mat = mesh.material as StandardMaterial3D
-			if not mat:
-				mat = StandardMaterial3D.new()
+			if not mat or mat.resource_path != "":
+				mat = (mat.duplicate() as StandardMaterial3D) if mat else StandardMaterial3D.new()
 				mesh.material = mat
 		if mat:
 			mat.albedo_color = col
@@ -112,10 +123,16 @@ func _set_button_emission(btn_node: Node, col: Color, energy: float) -> void:
 			mat.emission = col
 			mat.emission_energy_multiplier = energy
 
-func _update_visuals() -> void:
+func _update_visuals(force_power: Variant = null) -> void:
 	_init_visual_nodes()
 	var state = _get_level_state()
-	var power_on = state.is_power_on if state else true
+	var power_on: bool = false
+	if force_power != null:
+		power_on = bool(force_power)
+	elif state:
+		power_on = state.is_power_on
+	else:
+		power_on = false
 	
 	# The evacuation button panel is removed/hidden for the hub/start elevator, and kept ONLY for the evacuation elevator
 	if panel_inside:
@@ -146,15 +163,7 @@ func _update_visuals() -> void:
 			if status_light:
 				status_light.light_color = Color(0.2, 1.0, 0.4)
 				status_light.light_energy = 2.0
-			if status_mesh:
-				var mat = status_mesh.material as StandardMaterial3D
-				if not mat:
-					mat = StandardMaterial3D.new()
-					status_mesh.material = mat
-				mat.albedo_color = Color(0.2, 1.0, 0.4)
-				mat.emission_enabled = true
-				mat.emission = Color(0.2, 1.0, 0.4)
-				mat.emission_energy_multiplier = 2.0
+			_set_status_mesh_emission(Color(0.2, 1.0, 0.4), 2.0)
 				
 			if inside_panel_light:
 				inside_panel_light.light_color = Color(0.2, 1.0, 0.4)
@@ -180,15 +189,7 @@ func _update_visuals() -> void:
 			if status_light:
 				status_light.light_color = Color(1.0, 0.1, 0.1)
 				status_light.light_energy = 1.2
-			if status_mesh:
-				var mat = status_mesh.material as StandardMaterial3D
-				if not mat:
-					mat = StandardMaterial3D.new()
-					status_mesh.material = mat
-				mat.albedo_color = Color(1.0, 0.1, 0.1)
-				mat.emission_enabled = true
-				mat.emission = Color(1.0, 0.1, 0.1)
-				mat.emission_energy_multiplier = 1.2
+			_set_status_mesh_emission(Color(1.0, 0.1, 0.1), 1.2)
 			if inside_panel_light:
 				inside_panel_light.light_color = Color(1.0, 0.1, 0.1)
 				inside_panel_light.light_energy = 0.4
@@ -224,15 +225,7 @@ func _update_visuals() -> void:
 		if status_light:
 			status_light.light_color = Color(0.2, 1.0, 0.6)
 			status_light.light_energy = 1.5
-		if status_mesh:
-			var mat = status_mesh.material as StandardMaterial3D
-			if not mat:
-				mat = StandardMaterial3D.new()
-				status_mesh.material = mat
-			mat.albedo_color = Color(0.2, 1.0, 0.6)
-			mat.emission_enabled = true
-			mat.emission = Color(0.2, 1.0, 0.6)
-			mat.emission_energy_multiplier = 1.5
+		_set_status_mesh_emission(Color(0.2, 1.0, 0.6), 1.5)
 			
 		var prompt = "Close Elevator Gates" if is_open else "Open Elevator Gates"
 		if button_outside:
