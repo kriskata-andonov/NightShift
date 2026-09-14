@@ -1,7 +1,19 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scripts/rooms/ElevatorCabin.gd" id="1_script"]
 [ext_resource type="Script" path="res://scripts/interaction/Interactable.gd" id="2_interactable"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_housing"]
+size = Vector3(0.5, 0.85, 0.08)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hazard"]
+size = Vector3(0.44, 0.79, 0.02)
+
+[sub_resource type="BoxMesh" id="BoxMesh_face"]
+size = Vector3(0.38, 0.73, 0.02)
+
+[sub_resource type="BoxMesh" id="BoxMesh_btn"]
+size = Vector3(0.22, 0.22, 0.06)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
 albedo_color = Color(0.2, 0.2, 0.2, 1)
@@ -13,8 +25,43 @@ emission = Color(0.8, 0.1, 0.1, 1)
 emission_energy_multiplier = 0.5
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_button"]
-size = Vector3(0.4, 0.4, 0.2)
+size = Vector3(0.6, 0.8, 0.4)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_door"]
+albedo_color = Color(0.3, 0.33, 0.36, 1)
+metallic = 0.85
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_panel"]
+albedo_color = Color(0.18, 0.2, 0.22, 1)
+metallic = 0.7
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hazard"]
+albedo_color = Color(0.9, 0.72, 0.08, 1)
+emission_enabled = true
+emission = Color(0.6, 0.48, 0.05, 1)
+emission_energy_multiplier = 0.3
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rubber"]
+albedo_color = Color(0.06, 0.06, 0.07, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_arch"]
+albedo_color = Color(0.15, 0.16, 0.18, 1)
+metallic = 0.8
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sign_box"]
+albedo_color = Color(0.05, 0.06, 0.07, 1)
+metallic = 0.5
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_status_lamp"]
+albedo_color = Color(0.2, 1.0, 0.4, 1)
+emission_enabled = true
+emission = Color(0.2, 1.0, 0.4, 1)
+emission_energy_multiplier = 1.5
 
 [node name="ElevatorCabin" type="Node3D"]
 script = ExtResource("1_script")
@@ -69,47 +116,197 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, -6)
 operation = 2
 size = Vector3(3.0, 3.5, 2.0)
 
-[node name="ButtonPanel_Outside" type="CSGBox3D" parent="Geometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 1.5, -6.05)
-size = Vector3(0.4, 0.4, 0.1)
-material = SubResource("StandardMaterial3D_floor")
+[node name="DoorFrame" type="Node3D" parent="Geometry"]
 
-[node name="ButtonMesh" type="CSGBox3D" parent="Geometry/ButtonPanel_Outside"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05)
-size = Vector3(0.2, 0.2, 0.1)
-material = SubResource("StandardMaterial3D_red_btn")
+[node name="Frame_L" type="CSGBox3D" parent="Geometry/DoorFrame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.75, 1.75, -6.05)
+size = Vector3(0.5, 3.7, 0.3)
+material = SubResource("StandardMaterial3D_arch")
 
-[node name="Button_Outside" type="StaticBody3D" parent="Geometry/ButtonPanel_Outside"]
-collision_layer = 5
-script = ExtResource("2_interactable")
-prompt_text = "Call Elevator"
+[node name="Hazard_L" type="CSGBox3D" parent="Geometry/DoorFrame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.75, 1.75, -6.15)
+size = Vector3(0.2, 3.6, 0.1)
+material = SubResource("StandardMaterial3D_hazard")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/ButtonPanel_Outside/Button_Outside"]
-shape = SubResource("BoxShape3D_button")
+[node name="Frame_R" type="CSGBox3D" parent="Geometry/DoorFrame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.75, 1.75, -6.05)
+size = Vector3(0.5, 3.7, 0.3)
+material = SubResource("StandardMaterial3D_arch")
+
+[node name="Hazard_R" type="CSGBox3D" parent="Geometry/DoorFrame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.75, 1.75, -6.15)
+size = Vector3(0.2, 3.6, 0.1)
+material = SubResource("StandardMaterial3D_hazard")
+
+[node name="Frame_Top" type="CSGBox3D" parent="Geometry/DoorFrame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.65, -6.05)
+size = Vector3(4.0, 0.5, 0.3)
+material = SubResource("StandardMaterial3D_arch")
+
+[node name="HeaderBox" type="CSGBox3D" parent="Geometry/DoorFrame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.65, -6.22)
+size = Vector3(2.6, 0.55, 0.12)
+material = SubResource("StandardMaterial3D_sign_box")
+
+[node name="HeaderLabel" type="Label3D" parent="Geometry/DoorFrame/HeaderBox"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.08, -0.07)
+pixel_size = 0.005
+modulate = Color(0.2, 1, 0.6, 1)
+text = "▲ LEVEL 01 - SURFACE LIFT ▲"
+font_size = 36
+outline_size = 4
+
+[node name="StatusLabel" type="Label3D" parent="Geometry/DoorFrame/HeaderBox"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, -0.14, -0.07)
+pixel_size = 0.004
+modulate = Color(0.2, 1, 0.6, 1)
+text = "[ READY ]"
+font_size = 24
+outline_size = 2
+
+[node name="StatusMesh" type="CSGSphere3D" parent="Geometry/DoorFrame/HeaderBox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+radius = 0.12
+radial_segments = 16
+rings = 8
+material = SubResource("StandardMaterial3D_status_lamp")
+
+[node name="StatusLight" type="OmniLight3D" parent="Geometry/DoorFrame/HeaderBox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, -0.25)
+light_color = Color(0.2, 1, 0.4, 1)
+light_energy = 1.8
+omni_range = 6.0
+
+[node name="InsideHeaderBox" type="CSGBox3D" parent="Geometry/DoorFrame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.65, -5.88)
+size = Vector3(2.6, 0.55, 0.12)
+material = SubResource("StandardMaterial3D_sign_box")
+
+[node name="InsideHeaderLabel" type="Label3D" parent="Geometry/DoorFrame/InsideHeaderBox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0.07)
+pixel_size = 0.005
+modulate = Color(0.2, 1, 0.6, 1)
+text = "▲ LEVEL 01 - SURFACE LIFT ▲"
+font_size = 36
+outline_size = 4
+
+[node name="InsideStatusLabel" type="Label3D" parent="Geometry/DoorFrame/InsideHeaderBox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.14, 0.07)
+pixel_size = 0.004
+modulate = Color(0.2, 1, 0.6, 1)
+text = "[ READY ]"
+font_size = 24
+outline_size = 2
+
+[node name="TunnelEntrance" type="Node3D" parent="Geometry"]
+
+[node name="Portal_L" type="CSGBox3D" parent="Geometry/TunnelEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1, 2, -15.8)
+size = Vector3(0.4, 4, 0.4)
+material = SubResource("StandardMaterial3D_arch")
+
+[node name="Portal_Hazard_L" type="CSGBox3D" parent="Geometry/TunnelEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1, 2, -15.95)
+size = Vector3(0.2, 3.8, 0.1)
+material = SubResource("StandardMaterial3D_hazard")
+
+[node name="Portal_R" type="CSGBox3D" parent="Geometry/TunnelEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.1, 2, -15.8)
+size = Vector3(0.4, 4, 0.4)
+material = SubResource("StandardMaterial3D_arch")
+
+[node name="Portal_Hazard_R" type="CSGBox3D" parent="Geometry/TunnelEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.1, 2, -15.95)
+size = Vector3(0.2, 3.8, 0.1)
+material = SubResource("StandardMaterial3D_hazard")
+
+[node name="Portal_Top" type="CSGBox3D" parent="Geometry/TunnelEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, -15.8)
+size = Vector3(6.6, 0.5, 0.4)
+material = SubResource("StandardMaterial3D_arch")
+
+[node name="TunnelSign" type="CSGBox3D" parent="Geometry/TunnelEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, -15.95)
+size = Vector3(3.8, 0.45, 0.12)
+material = SubResource("StandardMaterial3D_sign_box")
+
+[node name="TunnelLabel" type="Label3D" parent="Geometry/TunnelEntrance/TunnelSign"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, -0.07)
+pixel_size = 0.005
+modulate = Color(0.2, 1, 0.6, 1)
+text = "▲ SURFACE ACCESS SHAFT ▲"
+font_size = 38
+outline_size = 4
+
+[node name="TunnelSignLight" type="OmniLight3D" parent="Geometry/TunnelEntrance/TunnelSign"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.4)
+light_color = Color(0.2, 1, 0.6, 1)
+light_energy = 1.5
+omni_range = 8.0
 
 [node name="GateLeft" type="CSGBox3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 1.75, -5.9)
 use_collision = true
 size = Vector3(1.5, 3.5, 0.2)
-material = SubResource("StandardMaterial3D_floor")
+material = SubResource("StandardMaterial3D_door")
+
+[node name="Panel_Top" type="CSGBox3D" parent="GateLeft"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -0.06)
+size = Vector3(1.2, 1.3, 0.08)
+material = SubResource("StandardMaterial3D_panel")
+
+[node name="Panel_Bottom" type="CSGBox3D" parent="GateLeft"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.7, -0.06)
+size = Vector3(1.2, 1.1, 0.08)
+material = SubResource("StandardMaterial3D_panel")
+
+[node name="HazardStripe" type="CSGBox3D" parent="GateLeft"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5, -0.08)
+size = Vector3(1.48, 0.3, 0.06)
+material = SubResource("StandardMaterial3D_hazard")
+
+[node name="RubberSeal" type="CSGBox3D" parent="GateLeft"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.72, 0, 0)
+size = Vector3(0.06, 3.5, 0.22)
+material = SubResource("StandardMaterial3D_rubber")
 
 [node name="GateRight" type="CSGBox3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 1.75, -5.9)
 use_collision = true
 size = Vector3(1.5, 3.5, 0.2)
-material = SubResource("StandardMaterial3D_floor")
+material = SubResource("StandardMaterial3D_door")
+
+[node name="Panel_Top" type="CSGBox3D" parent="GateRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -0.06)
+size = Vector3(1.2, 1.3, 0.08)
+material = SubResource("StandardMaterial3D_panel")
+
+[node name="Panel_Bottom" type="CSGBox3D" parent="GateRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.7, -0.06)
+size = Vector3(1.2, 1.1, 0.08)
+material = SubResource("StandardMaterial3D_panel")
+
+[node name="HazardStripe" type="CSGBox3D" parent="GateRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5, -0.08)
+size = Vector3(1.48, 0.3, 0.06)
+material = SubResource("StandardMaterial3D_hazard")
+
+[node name="RubberSeal" type="CSGBox3D" parent="GateRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.72, 0, 0)
+size = Vector3(0.06, 3.5, 0.22)
+material = SubResource("StandardMaterial3D_rubber")
 
 [node name="CabinLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
 light_color = Color(1, 0.9, 0.8, 1)
-light_energy = 2.0
+light_energy = 2
 shadow_enabled = true
 omni_range = 10.0
 
 [node name="TunnelLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, -11)
 light_color = Color(0.9, 0.95, 1, 1)
-light_energy = 1.0
+light_energy = 1
 shadow_enabled = true
 omni_range = 15.0
 
@@ -117,3 +314,122 @@ omni_range = 15.0
 
 [node name="Socket_0_0_N" type="Marker3D" parent="Sockets"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -16)
+
+[node name="ButtonPanel_Outside" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.25, 1.6, -6.05)
+
+[node name="PanelHousing" type="CSGBox3D" parent="ButtonPanel_Outside"]
+size = Vector3(0.5, 0.85, 0.12)
+material = SubResource("StandardMaterial3D_panel")
+
+[node name="HazardBorder" type="CSGBox3D" parent="ButtonPanel_Outside"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.01)
+size = Vector3(0.44, 0.79, 0.12)
+material = SubResource("StandardMaterial3D_hazard")
+
+[node name="FacePlate" type="CSGBox3D" parent="ButtonPanel_Outside"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.02)
+size = Vector3(0.38, 0.73, 0.12)
+material = SubResource("StandardMaterial3D_arch")
+
+[node name="ButtonMesh" type="CSGBox3D" parent="ButtonPanel_Outside"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.08, -0.1)
+size = Vector3(0.22, 0.22, 0.1)
+material = SubResource("StandardMaterial3D_red_btn")
+
+[node name="PanelLabel" type="Label3D" parent="ButtonPanel_Outside"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.22, -0.08)
+pixel_size = 0.003
+modulate = Color(1, 0.85, 0.2, 1)
+text = "CALL LIFT"
+font_size = 26
+outline_size = 3
+
+[node name="Button_Outside" type="StaticBody3D" parent="ButtonPanel_Outside"]
+collision_layer = 5
+collision_mask = 0
+script = ExtResource("2_interactable")
+prompt_text = "Call Elevator"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ButtonPanel_Outside/Button_Outside"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.1)
+shape = SubResource("BoxShape3D_button")
+
+[node name="ButtonPanel_Portal" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 1.6, -15.95)
+
+[node name="PortalHousing" type="CSGBox3D" parent="ButtonPanel_Portal"]
+size = Vector3(0.45, 0.75, 0.12)
+material = SubResource("StandardMaterial3D_panel")
+
+[node name="PortalButtonMesh" type="CSGBox3D" parent="ButtonPanel_Portal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.08, -0.1)
+size = Vector3(0.2, 0.2, 0.1)
+material = SubResource("StandardMaterial3D_red_btn")
+
+[node name="PortalLabel" type="Label3D" parent="ButtonPanel_Portal"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.2, -0.08)
+pixel_size = 0.003
+modulate = Color(1, 0.85, 0.2, 1)
+text = "CALL LIFT"
+font_size = 24
+outline_size = 3
+
+[node name="Button_Portal" type="StaticBody3D" parent="ButtonPanel_Portal"]
+collision_layer = 5
+collision_mask = 0
+script = ExtResource("2_interactable")
+prompt_text = "Call Elevator"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ButtonPanel_Portal/Button_Portal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.1)
+shape = SubResource("BoxShape3D_button")
+
+[node name="ButtonPanel_Inside" type="Node3D" parent="."]
+visible = false
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 5.46, 1.6, -2)
+
+[node name="InsideHousing" type="MeshInstance3D" parent="ButtonPanel_Inside"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.04)
+mesh = SubResource("BoxMesh_housing")
+material_override = SubResource("StandardMaterial3D_panel")
+
+[node name="InsideHazardBorder" type="MeshInstance3D" parent="ButtonPanel_Inside"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.09)
+mesh = SubResource("BoxMesh_hazard")
+material_override = SubResource("StandardMaterial3D_hazard")
+
+[node name="InsideFacePlate" type="MeshInstance3D" parent="ButtonPanel_Inside"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.11)
+mesh = SubResource("BoxMesh_face")
+material_override = SubResource("StandardMaterial3D_arch")
+
+[node name="InsideButtonMesh" type="MeshInstance3D" parent="ButtonPanel_Inside"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.08, 0.15)
+mesh = SubResource("BoxMesh_btn")
+material_override = SubResource("StandardMaterial3D_status_lamp")
+
+[node name="InsideLabel" type="Label3D" parent="ButtonPanel_Inside"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, 0.125)
+pixel_size = 0.0035
+double_sided = true
+modulate = Color(0.2, 1, 0.4, 1)
+text = "EVACUATE"
+font_size = 28
+outline_size = 4
+
+[node name="InsidePanelLight" type="OmniLight3D" parent="ButtonPanel_Inside"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0.3)
+light_color = Color(0.2, 1, 0.4, 1)
+light_energy = 0.8
+omni_range = 2.5
+
+[node name="Button_Inside" type="StaticBody3D" parent="ButtonPanel_Inside"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.15)
+collision_layer = 5
+collision_mask = 0
+script = ExtResource("2_interactable")
+prompt_text = "Activate Evacuation Lift"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ButtonPanel_Inside/Button_Inside"]
+shape = SubResource("BoxShape3D_button")
