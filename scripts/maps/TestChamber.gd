@@ -13,8 +13,8 @@ func _ready() -> void:
 	if not multiplayer.is_server():
 		return
 	
-	# Spawn all connected players
-	var spawn_points = [Vector3(0, 2, 0), Vector3(2, 2, 0), Vector3(-2, 2, 0), Vector3(0, 2, -2)]
+	# Spawn all connected players inside the Start Elevator (X=-12)
+	var spawn_points = [Vector3(-12, 2, 0), Vector3(-11, 2, 1), Vector3(-13, 2, -1), Vector3(-12, 2, -2)]
 	var i = 0
 	
 	var peer_ids = NetworkManager.players.keys()
@@ -37,6 +37,12 @@ func _ready() -> void:
 		if inv:
 			inv.initialize(pinfo.class)
 		i += 1
+		
+	# Automatically open the start elevator in the test chamber
+	var elevator = get_node_or_null("StartElevator")
+	if elevator and elevator.has_method("open_gates"):
+		# Add a small delay for dramatic effect or open immediately
+		get_tree().create_timer(1.0).timeout.connect(func(): elevator.open_gates())
 
 func _on_player_disconnected(id: int) -> void:
 	if multiplayer.is_server():

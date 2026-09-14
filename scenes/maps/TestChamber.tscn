@@ -8,6 +8,9 @@
 [ext_resource type="Resource" path="res://data/items/fuse.tres" id="6_fuse"]
 [ext_resource type="Script" uid="uid://crexaekaruaw7" path="res://scripts/player/PlayerModel.gd" id="7_model"]
 [ext_resource type="Script" uid="uid://b38vxv60dilxu" path="res://scripts/maps/TestChamber.gd" id="8_map"]
+[ext_resource type="PackedScene" path="res://scenes/objects/FusePanel.tscn" id="9_fusepanel"]
+[ext_resource type="PackedScene" path="res://scenes/objects/Generator.tscn" id="10_generator"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/modules/ElevatorCabin.tscn" id="11_elevator"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_grid"]
 render_priority = 0
@@ -91,6 +94,30 @@ item_data = ExtResource("6_fuse")
 [node name="Fuse3" parent="." unique_id=1636641519 instance=ExtResource("4_pickup")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5232, 0.5, -1.0244129)
 item_data = ExtResource("6_fuse")
+
+[node name="Fuse4" parent="." unique_id=2045865448 instance=ExtResource("4_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.0, 0.5, -4.0)
+item_data = ExtResource("6_fuse")
+
+[node name="Fuse5" parent="." unique_id=2045865449 instance=ExtResource("4_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.0, 0.5, -2.0)
+item_data = ExtResource("6_fuse")
+
+[node name="Fuse6" parent="." unique_id=2045865450 instance=ExtResource("4_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0, 0.5, -6.0)
+item_data = ExtResource("6_fuse")
+
+[node name="FusePanel" parent="." unique_id=987654321 instance=ExtResource("9_fusepanel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -4)
+
+[node name="Generator" parent="." unique_id=987654322 instance=ExtResource("10_generator")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -7)
+
+[node name="StartElevator" parent="." unique_id=987654323 instance=ExtResource("11_elevator")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 0)
+
+[node name="ExitElevator" parent="." unique_id=987654324 instance=ExtResource("11_elevator")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 12, 0, 0)
 
 [node name="DummyModel" type="Node3D" parent="." unique_id=1084901299]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.5, -2)

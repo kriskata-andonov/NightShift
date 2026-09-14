@@ -134,7 +134,7 @@ func update_player_name(new_name: String) -> void:
 @rpc("authority", "call_local", "reliable")
 func start_game() -> void:
 	game_started.emit()
-	get_tree().change_scene_to_file("res://scenes/maps/LabFacility.tscn")
+	get_tree().change_scene_to_file("res://scenes/maps/FacilityLevel.tscn")
 
 func _create_hover_sound() -> AudioStreamWAV:
 	var stream = AudioStreamWAV.new()
@@ -188,4 +188,4 @@ func vote_restart() -> void:
 func restart_game() -> void:
 	restart_votes.clear()
 	# Optional: Reset player states if persistent, but reloading scene usually works
-	get_tree().change_scene_to_file("res://scenes/maps/LabFacility.tscn")
+	get_tree().change_scene_to_file("res://scenes/maps/FacilityLevel.tscn")

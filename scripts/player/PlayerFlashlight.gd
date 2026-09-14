@@ -1,9 +1,10 @@
 extends SpotLight3D
 
-@export var max_battery: float = 60.0
+@export var max_battery: float = 300.0
 @export var drain_rate: float = 1.0
 
-var current_battery: float = 60.0
+## Current battery in seconds.
+var current_battery: float = 300.0
 var is_on: bool = true
 
 var _is_authority: bool = false

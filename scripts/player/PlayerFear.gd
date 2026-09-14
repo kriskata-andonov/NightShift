@@ -13,11 +13,11 @@ enum Tier { CALM, UNEASY, DISTRESSED, PANIC }
 
 @export var max_fear: float = 100.0
 ## How fast fear rises when the flashlight is off or dead.
-@export var darkness_rate: float = 4.0
+@export var darkness_rate: float = 1.0
 ## How fast fear decays when the flashlight is on.
 @export var light_decay_rate: float = 6.0
 ## Slow natural decay even in darkness (so fear doesn't stay pegged).
-@export var natural_decay_rate: float = 0.5
+@export var natural_decay_rate: float = 0.2
 
 var current_fear: float = 0.0
 var current_tier: int = Tier.CALM
