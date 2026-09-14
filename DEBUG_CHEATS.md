@@ -4,6 +4,21 @@ During Phase 1 development (before enemies and anomalies are fully implemented),
 
 These codes are implemented directly in the player scripts and should be removed or disabled before releasing the final game.
 
+## Debug FreeCam, Lighting & Power Cheats
+*Implemented in: `CheatCodeManager.gd` & `PlayerMovement.gd`*
+
+| Action / Code | Effect | Description |
+|---|---|---|
+| **`bug`** | Toggle Debug FreeCam + Light Boost | Activates/deactivates noclip flight. Automatically boosts ambient light to `Color8(83, 83, 83)` with energy `2.5` for clear visibility while debugging. Fly through walls/ceilings, speed boost with `Shift`, vertical flight with `Space`/`Ctrl`/`C`. Typing `bug` again restores original ambient lighting and returns to normal walking. |
+| **`P`** *(in FreeCam)* or **`pow`** | Toggle Facility Power | Instantly toggles facility power On/Off to test power systems, generator, lights, and exit elevator. |
+| **`L`** *(in FreeCam)* or **`lit`** | Toggle Ambient Light | Manually toggles the debug ambient light boost (`Color8(83, 83, 83)`, energy `2.5`) on/off without leaving FreeCam. |
+
+## Anti-Void Protection (Map Glitch Rescue)
+*Implemented in: `PlayerMovement.gd`, `FacilityDoor.gd`, `ElevatorCabin.gd`*
+
+- **Last Room Tracking**: Every time the player opens or passes through a facility door or calls an elevator cabin by pressing the button, the destination room (`last_room`) and its safe floor position (`last_room_position`) are recorded on the player.
+- **Automatic Void Rescue ($Y < -20.0$)**: If the player clips through geometry or falls into the void below $Y = -20.0$, their velocity is immediately reset (`velocity = Vector3.ZERO`) and they are safely teleported back onto solid floor in the last visited room, displaying an on-screen notification (`[ RESCUED FROM VOID: <Room Name> ]`).
+
 ## Fear System Cheats
 *Implemented in: `PlayerFear.gd`*
 

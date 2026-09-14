@@ -7,6 +7,8 @@ func _ready() -> void:
 	if interactable:
 		interactable.interacted.connect(_on_interacted)
 	LevelState.power_restored.connect(_on_power_restored)
+	if LevelState.has_signal("power_changed"):
+		LevelState.power_changed.connect(func(_is_on: bool): _update_prompt())
 	_update_prompt()
 
 func _on_interacted(_player: Node3D) -> void:
