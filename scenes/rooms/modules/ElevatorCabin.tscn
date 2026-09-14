@@ -1,0 +1,119 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/ElevatorCabin.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/interaction/Interactable.gd" id="2_interactable"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
+albedo_color = Color(0.2, 0.2, 0.2, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_red_btn"]
+albedo_color = Color(0.8, 0.1, 0.1, 1)
+emission_enabled = true
+emission = Color(0.8, 0.1, 0.1, 1)
+emission_energy_multiplier = 0.5
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_button"]
+size = Vector3(0.4, 0.4, 0.2)
+
+
+[node name="ElevatorCabin" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Geometry" type="CSGCombiner3D" parent="."]
+use_collision = true
+
+[node name="Floor" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+size = Vector3(12, 0.5, 12)
+material = SubResource("StandardMaterial3D_floor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.25, 0)
+size = Vector3(12, 0.5, 12)
+
+[node name="Wall_N" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -5.75)
+size = Vector3(12, 4, 0.5)
+
+[node name="Wall_S" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 5.75)
+size = Vector3(12, 4, 0.5)
+
+[node name="Wall_E" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.75, 2, 0)
+size = Vector3(0.5, 4, 12)
+
+[node name="Wall_W" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.75, 2, 0)
+size = Vector3(0.5, 4, 12)
+
+[node name="Tunnel_Floor" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, -11)
+size = Vector3(6, 0.5, 10)
+material = SubResource("StandardMaterial3D_floor")
+
+[node name="Tunnel_Ceiling" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.25, -11)
+size = Vector3(6, 0.5, 10)
+
+[node name="Tunnel_Wall_E" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.25, 2, -11)
+size = Vector3(0.5, 4, 10)
+
+[node name="Tunnel_Wall_W" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.25, 2, -11)
+size = Vector3(0.5, 4, 10)
+
+[node name="DoorCut_N" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, -6)
+operation = 2
+size = Vector3(3.0, 3.5, 2.0)
+
+[node name="ButtonPanel_Outside" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 1.5, -6.05)
+size = Vector3(0.4, 0.4, 0.1)
+material = SubResource("StandardMaterial3D_floor")
+
+[node name="ButtonMesh" type="CSGBox3D" parent="Geometry/ButtonPanel_Outside"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05)
+size = Vector3(0.2, 0.2, 0.1)
+material = SubResource("StandardMaterial3D_red_btn")
+
+[node name="Button_Outside" type="StaticBody3D" parent="Geometry/ButtonPanel_Outside"]
+collision_layer = 5
+script = ExtResource("2_interactable")
+prompt_text = "Call Elevator"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/ButtonPanel_Outside/Button_Outside"]
+shape = SubResource("BoxShape3D_button")
+
+[node name="GateLeft" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 1.75, -5.9)
+use_collision = true
+size = Vector3(1.5, 3.5, 0.2)
+material = SubResource("StandardMaterial3D_floor")
+
+[node name="GateRight" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 1.75, -5.9)
+use_collision = true
+size = Vector3(1.5, 3.5, 0.2)
+material = SubResource("StandardMaterial3D_floor")
+
+[node name="CabinLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+light_color = Color(1, 0.9, 0.8, 1)
+light_energy = 2.0
+shadow_enabled = true
+omni_range = 10.0
+
+[node name="TunnelLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, -11)
+light_color = Color(0.9, 0.95, 1, 1)
+light_energy = 1.0
+shadow_enabled = true
+omni_range = 15.0
+
+[node name="Sockets" type="Node3D" parent="."]
+
+[node name="Socket_0_0_N" type="Marker3D" parent="Sockets"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -16)

@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/maps/FacilityLevel.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/core/LevelGenerator.gd" id="2_script"]
+
+[sub_resource type="Environment" id="Environment_p5lce"]
+background_mode = 1
+background_color = Color(0.01, 0.01, 0.01, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.02, 0.02, 0.02, 1)
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.02
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_8mt7p"]
+geometry_parsed_geometry_type = 1
+agent_radius = 0.6
+
+[node name="FacilityLevel" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_p5lce")
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+navigation_mesh = SubResource("NavigationMesh_8mt7p")
+
+[node name="LevelGenerator" type="Node3D" parent="NavigationRegion3D"]
+script = ExtResource("2_script")
+
+[node name="PlayerSpawner" type="MultiplayerSpawner" parent="."]
+spawn_path = NodePath("..")
