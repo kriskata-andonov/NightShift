@@ -7,6 +7,12 @@ var seed_val: int = 0
 var floor_num: int = 1
 var rng: RandomNumberGenerator
 
+## Tuning parameters — adjust in Inspector or from code
+@export var branch_chance: float = 0.4
+@export var door_chance: float = 0.6
+@export var loop_chance: float = 0.3
+@export var fuses_per_level: int = 8
+
 var grid_instances: Dictionary = {}
 
 var modules = {
@@ -64,7 +70,7 @@ func generate_level(new_seed: int, new_floor: int) -> void:
 	var all_cells = grid_layout.keys().duplicate()
 	for cell in all_cells:
 		if cell != Vector2i(0,0):
-			if rng.randf() < 0.4:
+			if rng.randf() < branch_chance:
 				_random_walk(grid_layout, cell, rng.randi_range(1, 3))
 				
 	# Calculate topological BFS distances from start (0,0) to place exit elevator
@@ -72,7 +78,7 @@ func generate_level(new_seed: int, new_floor: int) -> void:
 	var end_pos = _select_exit_position(grid_layout, distances)
 	
 	# Add loops between adjacent rooms (excludes start and exit elevators)
-	_add_loops(grid_layout, end_pos, 0.3)
+	_add_loops(grid_layout, end_pos, loop_chance)
 	
 	_spawn_layout(grid_layout, end_pos)
 	print("Level generation complete. Total rooms: ", grid_layout.size(), " Exit at: ", end_pos)
@@ -262,13 +268,13 @@ func _spawn_layout(layout: Dictionary, end_pos: Vector2i) -> void:
 		if (mask & FLAG_S):
 			var neighbor = pos + DIR_S
 			if neighbor != Vector2i(0, 0) and neighbor != end_pos:
-				if rng.randf() < 0.6: # 60% chance for a door
+				if rng.randf() < door_chance: # 60% chance for a door
 					_spawn_door(pos, DIR_S)
 				
 		if (mask & FLAG_E):
 			var neighbor = pos + DIR_E
 			if neighbor != Vector2i(0, 0) and neighbor != end_pos:
-				if rng.randf() < 0.6:
+				if rng.randf() < door_chance:
 					_spawn_door(pos, DIR_E)
 				
 	_spawn_power_objects(end_pos)
@@ -290,7 +296,7 @@ func _spawn_power_objects(end_pos: Vector2i) -> void:
 		if k != Vector2i(0,0) and k != end_pos and k != Vector2i(0, -1):
 			available.append(k)
 			
-	var fuses_to_place = 8
+	var fuses_to_place = fuses_per_level
 	for i in range(fuses_to_place):
 		if available.is_empty():
 			break

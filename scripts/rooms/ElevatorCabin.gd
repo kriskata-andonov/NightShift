@@ -144,97 +144,112 @@ func _update_visuals(force_power: Variant = null) -> void:
 				col.disabled = !is_exit
 	
 	if is_exit:
-		# --- EXIT / EXTRACTION ELEVATOR ---
-		if tunnel_label:
-			tunnel_label.text = "▼ EXTRACTION ELEVATOR SHAFT ▼"
-			tunnel_label.modulate = Color(1.0, 0.65, 0.1)
-		if tunnel_light:
-			tunnel_light.light_color = Color(1.0, 0.65, 0.1)
-			tunnel_light.light_energy = 1.8
-			
-		if header_label:
-			header_label.text = "▼ EVACUATION LIFT - SECTOR EXIT ▼"
-			header_label.modulate = Color(1.0, 0.65, 0.1)
-			
-		if power_on:
-			if status_label:
-				status_label.text = "[ READY - POWER RESTORED ]"
-				status_label.modulate = Color(0.2, 1.0, 0.4)
-			if status_light:
-				status_light.light_color = Color(0.2, 1.0, 0.4)
-				status_light.light_energy = 2.0
-			_set_status_mesh_emission(Color(0.2, 1.0, 0.4), 2.0)
-				
-			if inside_panel_light:
-				inside_panel_light.light_color = Color(0.2, 1.0, 0.4)
-				inside_panel_light.light_energy = 0.8
-			if inside_label:
-				inside_label.modulate = Color(0.2, 1.0, 0.4)
-				inside_label.text = "EVACUATE"
-
-			var prompt = "Close Elevator Gates" if is_open else "Open Elevator Gates"
-			if button_outside:
-				button_outside.prompt_text = prompt
-			if button_portal:
-				button_portal.prompt_text = prompt
-			if button_inside:
-				button_inside.prompt_text = "Activate Evacuation Lift"
-			_set_button_emission(button_outside, Color(0.2, 1.0, 0.4), 2.0)
-			_set_button_emission(button_portal, Color(0.2, 1.0, 0.4), 2.0)
-			_set_button_emission(button_inside, Color(0.2, 1.0, 0.4), 2.0)
-		else:
-			if status_label:
-				status_label.text = "[ OFFLINE - RESTORE POWER AT GENERATOR ]"
-				status_label.modulate = Color(1.0, 0.2, 0.2)
-			if status_light:
-				status_light.light_color = Color(1.0, 0.1, 0.1)
-				status_light.light_energy = 1.2
-			_set_status_mesh_emission(Color(1.0, 0.1, 0.1), 1.2)
-			if inside_panel_light:
-				inside_panel_light.light_color = Color(1.0, 0.1, 0.1)
-				inside_panel_light.light_energy = 0.4
-			if inside_label:
-				inside_label.modulate = Color(1.0, 0.2, 0.2)
-				inside_label.text = "NO POWER"
-
-			if button_outside:
-				button_outside.prompt_text = "Call Elevator (No Power)"
-			if button_portal:
-				button_portal.prompt_text = "Call Elevator (No Power)"
-			if button_inside:
-				button_inside.prompt_text = "Elevator Offline (No Power)"
-			_set_button_emission(button_outside, Color(1.0, 0.1, 0.1), 1.0)
-			_set_button_emission(button_portal, Color(1.0, 0.1, 0.1), 1.0)
-			_set_button_emission(button_inside, Color(1.0, 0.1, 0.1), 1.0)
+		_update_exit_visuals(power_on)
 	else:
-		# --- ENTRANCE / SURFACE ACCESS HUB ---
-		if tunnel_label:
-			tunnel_label.text = "▲ SURFACE ACCESS SHAFT ▲"
-			tunnel_label.modulate = Color(0.2, 1.0, 0.6)
-		if tunnel_light:
-			tunnel_light.light_color = Color(0.2, 1.0, 0.6)
-			tunnel_light.light_energy = 1.8
-			
-		if header_label:
-			header_label.text = "▲ LEVEL 01 - SURFACE ENTRY HUB ▲"
-			header_label.modulate = Color(0.2, 1.0, 0.6)
-			
-		if status_label:
-			status_label.text = "[ SURFACE ACCESS LIFT - ACTIVE ]"
-			status_label.modulate = Color(0.2, 1.0, 0.6)
-		if status_light:
-			status_light.light_color = Color(0.2, 1.0, 0.6)
-			status_light.light_energy = 1.5
-		_set_status_mesh_emission(Color(0.2, 1.0, 0.6), 1.5)
-			
-		var prompt = "Close Elevator Gates" if is_open else "Open Elevator Gates"
-		if button_outside:
-			button_outside.prompt_text = prompt
-		if button_portal:
-			button_portal.prompt_text = prompt
-		_set_button_emission(button_outside, Color(0.2, 1.0, 0.6), 1.5)
-		_set_button_emission(button_portal, Color(0.2, 1.0, 0.6), 1.5)
+		_update_entrance_visuals()
 
+	_sync_inside_headers()
+
+func _update_exit_visuals(power_on: bool) -> void:
+	# --- EXIT / EXTRACTION ELEVATOR ---
+	if tunnel_label:
+		tunnel_label.text = "▼ EXTRACTION ELEVATOR SHAFT ▼"
+		tunnel_label.modulate = Color(1.0, 0.65, 0.1)
+	if tunnel_light:
+		tunnel_light.light_color = Color(1.0, 0.65, 0.1)
+		tunnel_light.light_energy = 1.8
+		
+	if header_label:
+		header_label.text = "▼ EVACUATION LIFT - SECTOR EXIT ▼"
+		header_label.modulate = Color(1.0, 0.65, 0.1)
+		
+	if power_on:
+		_update_exit_powered()
+	else:
+		_update_exit_unpowered()
+
+func _update_exit_powered() -> void:
+	if status_label:
+		status_label.text = "[ READY - POWER RESTORED ]"
+		status_label.modulate = Color(0.2, 1.0, 0.4)
+	if status_light:
+		status_light.light_color = Color(0.2, 1.0, 0.4)
+		status_light.light_energy = 2.0
+	_set_status_mesh_emission(Color(0.2, 1.0, 0.4), 2.0)
+			
+	if inside_panel_light:
+		inside_panel_light.light_color = Color(0.2, 1.0, 0.4)
+		inside_panel_light.light_energy = 0.8
+	if inside_label:
+		inside_label.modulate = Color(0.2, 1.0, 0.4)
+		inside_label.text = "EVACUATE"
+
+	var prompt = "Close Elevator Gates" if is_open else "Open Elevator Gates"
+	if button_outside:
+		button_outside.prompt_text = prompt
+	if button_portal:
+		button_portal.prompt_text = prompt
+	if button_inside:
+		button_inside.prompt_text = "Activate Evacuation Lift"
+	_set_button_emission(button_outside, Color(0.2, 1.0, 0.4), 2.0)
+	_set_button_emission(button_portal, Color(0.2, 1.0, 0.4), 2.0)
+	_set_button_emission(button_inside, Color(0.2, 1.0, 0.4), 2.0)
+
+func _update_exit_unpowered() -> void:
+	if status_label:
+		status_label.text = "[ OFFLINE - RESTORE POWER AT GENERATOR ]"
+		status_label.modulate = Color(1.0, 0.2, 0.2)
+	if status_light:
+		status_light.light_color = Color(1.0, 0.1, 0.1)
+		status_light.light_energy = 1.2
+	_set_status_mesh_emission(Color(1.0, 0.1, 0.1), 1.2)
+	if inside_panel_light:
+		inside_panel_light.light_color = Color(1.0, 0.1, 0.1)
+		inside_panel_light.light_energy = 0.4
+	if inside_label:
+		inside_label.modulate = Color(1.0, 0.2, 0.2)
+		inside_label.text = "NO POWER"
+
+	if button_outside:
+		button_outside.prompt_text = "Call Elevator (No Power)"
+	if button_portal:
+		button_portal.prompt_text = "Call Elevator (No Power)"
+	if button_inside:
+		button_inside.prompt_text = "Elevator Offline (No Power)"
+	_set_button_emission(button_outside, Color(1.0, 0.1, 0.1), 1.0)
+	_set_button_emission(button_portal, Color(1.0, 0.1, 0.1), 1.0)
+	_set_button_emission(button_inside, Color(1.0, 0.1, 0.1), 1.0)
+
+func _update_entrance_visuals() -> void:
+	# --- ENTRANCE / SURFACE ACCESS HUB ---
+	if tunnel_label:
+		tunnel_label.text = "▲ SURFACE ACCESS SHAFT ▲"
+		tunnel_label.modulate = Color(0.2, 1.0, 0.6)
+	if tunnel_light:
+		tunnel_light.light_color = Color(0.2, 1.0, 0.6)
+		tunnel_light.light_energy = 1.8
+		
+	if header_label:
+		header_label.text = "▲ LEVEL 01 - SURFACE ENTRY HUB ▲"
+		header_label.modulate = Color(0.2, 1.0, 0.6)
+		
+	if status_label:
+		status_label.text = "[ SURFACE ACCESS LIFT - ACTIVE ]"
+		status_label.modulate = Color(0.2, 1.0, 0.6)
+	if status_light:
+		status_light.light_color = Color(0.2, 1.0, 0.6)
+		status_light.light_energy = 1.5
+	_set_status_mesh_emission(Color(0.2, 1.0, 0.6), 1.5)
+		
+	var prompt = "Close Elevator Gates" if is_open else "Open Elevator Gates"
+	if button_outside:
+		button_outside.prompt_text = prompt
+	if button_portal:
+		button_portal.prompt_text = prompt
+	_set_button_emission(button_outside, Color(0.2, 1.0, 0.6), 1.5)
+	_set_button_emission(button_portal, Color(0.2, 1.0, 0.6), 1.5)
+
+func _sync_inside_headers() -> void:
 	if inside_header_label and header_label:
 		inside_header_label.text = header_label.text
 		inside_header_label.modulate = header_label.modulate

@@ -1,7 +1,7 @@
 extends Node3D
 
-@onready var door_left: CSGBox3D = $DoorLeft
-@onready var door_right: CSGBox3D = $DoorRight
+@onready var door_left: Node3D = $DoorLeft
+@onready var door_right: Node3D = $DoorRight
 @onready var button_front = $Panel_Front/Button_Front
 @onready var button_back = $Panel_Back/Button_Back
 
