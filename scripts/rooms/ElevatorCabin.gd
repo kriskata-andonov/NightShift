@@ -311,9 +311,9 @@ func open_gates() -> void:
 	var tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	
 	if gate_left:
-		tween.tween_property(gate_left, "position:x", -2.75, 2.5)
+		tween.tween_property(gate_left, "position:x", -2.15, 2.2)
 	if gate_right:
-		tween.tween_property(gate_right, "position:x", 2.75, 2.5)
+		tween.tween_property(gate_right, "position:x", 2.15, 2.2)
 
 @rpc("any_peer", "call_local")
 func close_gates() -> void:
@@ -324,6 +324,6 @@ func close_gates() -> void:
 	print("Elevator gates closing!")
 	var tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	if gate_left:
-		tween.tween_property(gate_left, "position:x", -0.75, 2.5)
+		tween.tween_property(gate_left, "position:x", -0.75, 2.2)
 	if gate_right:
-		tween.tween_property(gate_right, "position:x", 0.75, 2.5)
+		tween.tween_property(gate_right, "position:x", 0.75, 2.2)

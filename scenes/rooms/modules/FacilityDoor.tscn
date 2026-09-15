@@ -1,31 +1,8 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene format=3 uid="uid://b05yg2w867f74"]
 
-[ext_resource type="Script" path="res://scripts/rooms/FacilityDoor.gd" id="1_script"]
-[ext_resource type="Script" path="res://scripts/interaction/Interactable.gd" id="2_interactable"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_frame"]
-albedo_color = Color(0.25, 0.25, 0.28, 1)
-metallic = 0.6
-roughness = 0.5
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_door"]
-albedo_color = Color(0.3, 0.3, 0.35, 1)
-metallic = 0.8
-roughness = 0.4
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_panel"]
-albedo_color = Color(0.15, 0.15, 0.15, 1)
-metallic = 0.5
-roughness = 0.7
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_red_btn"]
-albedo_color = Color(0.8, 0.1, 0.1, 1)
-emission_enabled = true
-emission = Color(0.8, 0.1, 0.1, 1)
-emission_energy_multiplier = 0.5
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_button"]
-size = Vector3(0.4, 0.4, 0.2)
+[ext_resource type="Script" uid="uid://bvtb2mmsfm7q5" path="res://scripts/rooms/FacilityDoor.gd" id="1_script"]
+[ext_resource type="Material" uid="uid://d4mpyk61oqei" path="res://materials/wall_material_3d.tres" id="2_0yopx"]
+[ext_resource type="Script" uid="uid://1h8mxk0hsslq" path="res://scripts/interaction/Interactable.gd" id="2_interactable"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_frame_l"]
 size = Vector3(1.5, 4, 1)
@@ -45,113 +22,132 @@ size = Vector3(6, 0.5, 1)
 [sub_resource type="BoxShape3D" id="BoxShape3D_frame_top"]
 size = Vector3(6, 0.5, 1)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_door"]
+albedo_color = Color(0.3, 0.3, 0.35, 1)
+metallic = 0.8
+roughness = 0.4
+
 [sub_resource type="BoxMesh" id="BoxMesh_door"]
 size = Vector3(1.5, 3.5, 0.2)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_door"]
 size = Vector3(1.5, 3.5, 0.2)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_panel"]
+albedo_color = Color(0.15, 0.15, 0.15, 1)
+metallic = 0.5
+roughness = 0.7
+
 [sub_resource type="BoxMesh" id="BoxMesh_panel"]
 size = Vector3(0.4, 0.4, 0.1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_red_btn"]
+albedo_color = Color(0.8, 0.1, 0.1, 1)
+emission_enabled = true
+emission = Color(0.8, 0.1, 0.1, 1)
+emission_energy_multiplier = 0.5
 
 [sub_resource type="BoxMesh" id="BoxMesh_btn"]
 size = Vector3(0.2, 0.2, 0.1)
 
-[node name="FacilityDoor" type="Node3D"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_button"]
+size = Vector3(0.4, 0.4, 0.2)
+
+[node name="FacilityDoor" type="Node3D" unique_id=1786378320]
 script = ExtResource("1_script")
 
-[node name="Geometry" type="Node3D" parent="."]
+[node name="Geometry" type="Node3D" parent="." unique_id=50887568]
 
-[node name="Frame_L" type="StaticBody3D" parent="Geometry"]
+[node name="Frame_L" type="StaticBody3D" parent="Geometry" unique_id=2082963959]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.25, 2, 0)
 
-[node name="Mesh" type="MeshInstance3D" parent="Geometry/Frame_L"]
+[node name="Mesh" type="MeshInstance3D" parent="Geometry/Frame_L" unique_id=2146186446]
+material_override = ExtResource("2_0yopx")
 mesh = SubResource("BoxMesh_frame_l")
-material_override = SubResource("StandardMaterial3D_frame")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Frame_L"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Frame_L" unique_id=1870914315]
 shape = SubResource("BoxShape3D_frame_l")
 
-[node name="Frame_R" type="StaticBody3D" parent="Geometry"]
+[node name="Frame_R" type="StaticBody3D" parent="Geometry" unique_id=306196736]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.25, 2, 0)
 
-[node name="Mesh" type="MeshInstance3D" parent="Geometry/Frame_R"]
+[node name="Mesh" type="MeshInstance3D" parent="Geometry/Frame_R" unique_id=874327669]
+material_override = ExtResource("2_0yopx")
 mesh = SubResource("BoxMesh_frame_r")
-material_override = SubResource("StandardMaterial3D_frame")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Frame_R"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Frame_R" unique_id=1988692246]
 shape = SubResource("BoxShape3D_frame_r")
 
-[node name="Frame_Top" type="StaticBody3D" parent="Geometry"]
+[node name="Frame_Top" type="StaticBody3D" parent="Geometry" unique_id=59767577]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.75, 0)
 
-[node name="Mesh" type="MeshInstance3D" parent="Geometry/Frame_Top"]
+[node name="Mesh" type="MeshInstance3D" parent="Geometry/Frame_Top" unique_id=2098087909]
+material_override = ExtResource("2_0yopx")
 mesh = SubResource("BoxMesh_frame_top")
-material_override = SubResource("StandardMaterial3D_frame")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Frame_Top"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Frame_Top" unique_id=1984221568]
 shape = SubResource("BoxShape3D_frame_top")
 
-[node name="DoorLeft" type="Node3D" parent="."]
+[node name="DoorLeft" type="Node3D" parent="." unique_id=301856824]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 1.75, 0)
 
-[node name="Mesh" type="MeshInstance3D" parent="DoorLeft"]
-mesh = SubResource("BoxMesh_door")
+[node name="Mesh" type="MeshInstance3D" parent="DoorLeft" unique_id=1835748488]
 material_override = SubResource("StandardMaterial3D_door")
+mesh = SubResource("BoxMesh_door")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="DoorLeft"]
+[node name="StaticBody3D" type="StaticBody3D" parent="DoorLeft" unique_id=510215842]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="DoorLeft/StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DoorLeft/StaticBody3D" unique_id=173965404]
 shape = SubResource("BoxShape3D_door")
 
-[node name="DoorRight" type="Node3D" parent="."]
+[node name="DoorRight" type="Node3D" parent="." unique_id=638471086]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 1.75, 0)
 
-[node name="Mesh" type="MeshInstance3D" parent="DoorRight"]
-mesh = SubResource("BoxMesh_door")
+[node name="Mesh" type="MeshInstance3D" parent="DoorRight" unique_id=839832660]
 material_override = SubResource("StandardMaterial3D_door")
+mesh = SubResource("BoxMesh_door")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="DoorRight"]
+[node name="StaticBody3D" type="StaticBody3D" parent="DoorRight" unique_id=1041957502]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="DoorRight/StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DoorRight/StaticBody3D" unique_id=32230557]
 shape = SubResource("BoxShape3D_door")
 
-[node name="Panel_Front" type="Node3D" parent="."]
+[node name="Panel_Front" type="Node3D" parent="." unique_id=1838983869]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 1.5, 0.55)
 
-[node name="PanelMesh" type="MeshInstance3D" parent="Panel_Front"]
-mesh = SubResource("BoxMesh_panel")
+[node name="PanelMesh" type="MeshInstance3D" parent="Panel_Front" unique_id=1788669306]
 material_override = SubResource("StandardMaterial3D_panel")
+mesh = SubResource("BoxMesh_panel")
 
-[node name="ButtonMesh" type="MeshInstance3D" parent="Panel_Front"]
+[node name="ButtonMesh" type="MeshInstance3D" parent="Panel_Front" unique_id=1407262953]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.05)
-mesh = SubResource("BoxMesh_btn")
 material_override = SubResource("StandardMaterial3D_red_btn")
+mesh = SubResource("BoxMesh_btn")
 
-[node name="Button_Front" type="StaticBody3D" parent="Panel_Front"]
+[node name="Button_Front" type="StaticBody3D" parent="Panel_Front" unique_id=4802287]
 collision_layer = 5
 script = ExtResource("2_interactable")
 prompt_text = "Press E to open door"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Panel_Front/Button_Front"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Panel_Front/Button_Front" unique_id=294594613]
 shape = SubResource("BoxShape3D_button")
 
-[node name="Panel_Back" type="Node3D" parent="."]
+[node name="Panel_Back" type="Node3D" parent="." unique_id=1016809851]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 1.5, -0.55)
 
-[node name="PanelMesh" type="MeshInstance3D" parent="Panel_Back"]
-mesh = SubResource("BoxMesh_panel")
+[node name="PanelMesh" type="MeshInstance3D" parent="Panel_Back" unique_id=1901791878]
 material_override = SubResource("StandardMaterial3D_panel")
+mesh = SubResource("BoxMesh_panel")
 
-[node name="ButtonMesh" type="MeshInstance3D" parent="Panel_Back"]
+[node name="ButtonMesh" type="MeshInstance3D" parent="Panel_Back" unique_id=1948914083]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05)
-mesh = SubResource("BoxMesh_btn")
 material_override = SubResource("StandardMaterial3D_red_btn")
+mesh = SubResource("BoxMesh_btn")
 
-[node name="Button_Back" type="StaticBody3D" parent="Panel_Back"]
+[node name="Button_Back" type="StaticBody3D" parent="Panel_Back" unique_id=1864567595]
 collision_layer = 5
 script = ExtResource("2_interactable")
 prompt_text = "Press E to open door"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Panel_Back/Button_Back"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Panel_Back/Button_Back" unique_id=772732796]
 shape = SubResource("BoxShape3D_button")
