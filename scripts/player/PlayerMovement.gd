@@ -10,10 +10,20 @@ enum PlayerClass {
 @export var character_class: PlayerClass = PlayerClass.ATHLETE:
 	set(value):
 		character_class = value
-		if is_inside_tree():
-			var inv = get_node_or_null("PlayerInventory")
-			if inv and inv.has_method("initialize"):
-				inv.initialize(value)
+		_apply_character_class(value)
+
+func _apply_character_class(value: int) -> void:
+	if not is_inside_tree():
+		return
+	var inv = get_node_or_null("PlayerInventory")
+	if inv and inv.has_method("initialize"):
+		inv.initialize(value)
+	normal_head_height = PlayerModel.get_eye_height(value)
+	if head:
+		head.position.y = normal_head_height
+	var model = get_node_or_null("PlayerModel")
+	if model and model.has_method("set_class_visuals"):
+		model.set_class_visuals(value)
 
 @export var walk_speed: float = 3.5
 @export var sprint_speed: float = 6.5
@@ -74,6 +84,9 @@ func _enter_tree() -> void:
 		peer_id = 1
 	set_multiplayer_authority(peer_id)
 	
+	if NetworkManager and NetworkManager.players.has(peer_id):
+		character_class = NetworkManager.players[peer_id].get("class", character_class)
+	
 	var sync = get_node_or_null("MultiplayerSynchronizer")
 	if sync:
 		sync.set_multiplayer_authority(peer_id)
@@ -84,6 +97,12 @@ func _ready() -> void:
 	head = get_node_or_null("Head")
 	if head:
 		camera = head.get_node_or_null("Camera3D")
+	
+	var peer_id = name.to_int()
+	if NetworkManager and NetworkManager.players.has(peer_id):
+		character_class = NetworkManager.players[peer_id].get("class", character_class)
+		
+	_apply_character_class(character_class)
 	
 	if not is_multiplayer_authority():
 		var ui = get_node_or_null("InteractionUI")
@@ -113,12 +132,23 @@ func _ready() -> void:
 	if ui:
 		debug_hud = ui.get_node_or_null("DebugHUD")
 
+	# Connect to LevelState power changes so DebugHUD updates across all clients in freecam
+	var state = get_node_or_null("/root/LevelState")
+	if not state and is_inside_tree() and get_tree().root:
+		state = get_tree().root.get_node_or_null("LevelState")
+	if state and state.has_signal("power_changed"):
+		state.power_changed.connect(_on_level_power_changed)
+
+	# Set exact eye-level camera height based on the character model's visor
+	normal_head_height = PlayerModel.get_eye_height(character_class)
+	if head:
+		head.position.y = normal_head_height
+
 	# Apply Class Modifiers
 	if character_class == PlayerClass.ATHLETE:
 		sprint_speed *= 1.15
 		max_stamina = 130.0
 		current_stamina = max_stamina
-		normal_head_height *= 1.1 # Taller
 		
 		# Create a placeholder audio node for the Athlete's loud breathing tradeoff
 		exhausted_audio = AudioStreamPlayer3D.new()
@@ -127,8 +157,6 @@ func _ready() -> void:
 		exhausted_audio.volume_db = 5.0
 		add_child(exhausted_audio)
 	elif character_class == PlayerClass.ENGINEER:
-		normal_head_height *= 0.92 # Slightly shorter
-		
 		# Engineer Tradeoff: Constant faint electrical hum
 		var engineer_audio := AudioStreamPlayer3D.new()
 		engineer_audio.name = "ElectricalHum"
@@ -138,9 +166,9 @@ func _ready() -> void:
 		# engineer_audio.autoplay = true
 		add_child(engineer_audio)
 	elif character_class == PlayerClass.HOARDER:
-		normal_head_height *= 0.9 # Shorter
+		pass
 	elif character_class == PlayerClass.FRESHMAN:
-		normal_head_height *= 0.95 # Slightly shorter
+		pass
 		
 	if camera:
 		camera.current = true
@@ -351,9 +379,16 @@ func _process_debug_cam_movement(delta: float) -> void:
 	global_position += move_dir * speed * delta
 	velocity = Vector3.ZERO
 
+func _on_level_power_changed(is_on: bool) -> void:
+	_update_debug_hud()
+	if is_debug_cam:
+		var power_txt = "ON" if is_on else "OFF"
+		show_toast("[ FACILITY POWER: " + power_txt + " ]", 2.0)
+
 func _toggle_facility_power() -> void:
-	var tree: SceneTree = get_tree() if is_inside_tree() else (Engine.get_main_loop() as SceneTree)
-	var state = tree.root.get_node_or_null("LevelState") if (tree and tree.root) else get_node_or_null("/root/LevelState")
+	var state = get_node_or_null("/root/LevelState")
+	if not state and is_inside_tree() and get_tree().root:
+		state = get_tree().root.get_node_or_null("LevelState")
 	if not state:
 		print("LevelState singleton not found!")
 		return
@@ -371,11 +406,6 @@ func _toggle_facility_power() -> void:
 				state.power_restored.emit()
 		if state.has_signal("power_changed"):
 			state.power_changed.emit(state.is_power_on)
-			
-	var power_txt = "ON" if state.is_power_on else "OFF"
-	print("[DEBUG] Facility power toggled: ", power_txt)
-	show_toast("[ FACILITY POWER: " + power_txt + " ]", 2.0)
-	_update_debug_hud()
 
 func _update_debug_hud() -> void:
 	if not debug_hud:

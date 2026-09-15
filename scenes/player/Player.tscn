@@ -33,7 +33,7 @@ properties/2/spawn = true
 properties/2/replication_mode = 1
 properties/3/path = NodePath(":character_class")
 properties/3/spawn = true
-properties/3/replication_mode = 1
+properties/3/replication_mode = 0
 
 [node name="Player" type="CharacterBody3D" groups=["players"] unique_id=1692945597]
 collision_layer = 2
