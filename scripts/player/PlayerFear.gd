@@ -13,10 +13,12 @@ enum Tier { CALM, UNEASY, DISTRESSED, PANIC }
 
 @export var max_fear: float = 100.0
 ## How fast fear rises when the flashlight is off or dead.
-@export var darkness_rate: float = 1.0
+## 0.556 = ~180 seconds from 0 to max fear.
+@export var darkness_rate: float = 0.556
 ## How fast fear decays when the flashlight is on.
-@export var light_decay_rate: float = 6.0
-## Slow natural decay even in darkness (so fear doesn't stay pegged).
+## 1.25 = ~80 seconds for full decay from max.
+@export var light_decay_rate: float = 1.25
+## Slow natural decay even in darkness (so fear doesn't stay pegged forever).
 @export var natural_decay_rate: float = 0.2
 
 var current_fear: float = 0.0
@@ -69,11 +71,10 @@ func _find_nodes() -> void:
 			flashlight = camera.get_node_or_null("Flashlight")
 
 func _process(delta: float) -> void:
-	if not multiplayer.has_multiplayer_peer():
-		return
 	var player = get_parent()
-	if player and player is CharacterBody3D and not player.is_multiplayer_authority():
-		return
+	if player and player is CharacterBody3D:
+		if multiplayer.has_multiplayer_peer() and not player.is_multiplayer_authority():
+			return
 		
 	# Don't accumulate fear when downed or dead
 	if health_node and (health_node.is_downed() or health_node.state == health_node.State.DEAD):
@@ -95,6 +96,8 @@ func _update_fear(delta: float) -> void:
 		
 	if _is_in_darkness():
 		current_fear += drate * delta
+		# Slow natural decay even in darkness so fear doesn't stay pegged forever
+		current_fear -= natural_decay_rate * delta
 	else:
 		current_fear -= light_decay_rate * delta
 

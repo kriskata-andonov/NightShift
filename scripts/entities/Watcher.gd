@@ -17,7 +17,7 @@ var _flee_timer: float = 0.0
 var los_raycast: RayCast3D
 
 func _ready() -> void:
-	if not multiplayer.is_server():
+	if multiplayer.has_multiplayer_peer() and not multiplayer.is_server():
 		set_physics_process(false)
 		return
 		

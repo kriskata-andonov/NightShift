@@ -111,3 +111,18 @@ func _enter_downed() -> void:
 func _die() -> void:
 	state = State.DEAD
 	died.emit()
+
+## Server-authoritative damage — Monster AI calls this via RPC.
+@rpc("authority", "call_local", "reliable")
+func rpc_take_damage(amount: float) -> void:
+	take_damage(amount)
+
+## Server-authoritative heal — revive items, etc.
+@rpc("authority", "call_local", "reliable")
+func rpc_heal(amount: float) -> void:
+	heal(amount)
+
+## Server-authoritative revive.
+@rpc("authority", "call_local", "reliable")
+func rpc_revive() -> void:
+	revive()

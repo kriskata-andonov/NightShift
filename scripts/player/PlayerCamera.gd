@@ -27,9 +27,3 @@ func _unhandled_input(event: InputEvent) -> void:
 		var pitch = rotation.x - event.relative.y * mouse_sensitivity
 		pitch = clamp(pitch, deg_to_rad(min_pitch), deg_to_rad(max_pitch))
 		rotation.x = pitch
-
-	if event.is_action_pressed("ui_cancel"):
-		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		else:
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED

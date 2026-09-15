@@ -4,6 +4,8 @@ class_name FlashlightHUD
 ## Shows a percentage and a simple text bar that drains visually.
 
 var flashlight: Node = null
+var _last_pct_int: int = -1
+var _last_status: String = ""
 
 func _ready() -> void:
 	# Style and position — bottom-right corner
@@ -53,10 +55,6 @@ func _process(_delta: float) -> void:
 
 	var pct_int: int = ceili(pct)
 
-	# Build a 10-segment bar: ██████████
-	var filled: int = roundi(pct / 10.0)
-	var bar: String = "█".repeat(filled) + "░".repeat(10 - filled)
-
 	# Color coding via prefix — check battery first, then on/off state
 	var status: String
 	if pct <= 0.0:
@@ -67,6 +65,16 @@ func _process(_delta: float) -> void:
 		status = "LOW"
 	else:
 		status = "ON"
+
+	# Skip rebuild if nothing changed
+	if pct_int == _last_pct_int and status == _last_status:
+		return
+	_last_pct_int = pct_int
+	_last_status = status
+
+	# Build a 10-segment bar: ██████████
+	var filled: int = roundi(pct / 10.0)
+	var bar: String = "█".repeat(filled) + "░".repeat(10 - filled)
 
 	text = "🔦 %s  %d%%\n[%s]" % [status, pct_int, bar]
 
